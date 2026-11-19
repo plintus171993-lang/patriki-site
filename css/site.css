@@ -297,3 +297,22 @@ main#app { flex: 1; }
 .pk-loader img { width: 84px; height: 84px; animation: bob 1.2s ease-in-out infinite; }
 @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
 .app-strip { display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: radial-gradient(circle at 90% 50%, rgba(212,168,75,.16), transparent 50%), var(--surface); }
+
+/* админка меню (/admin/) */
+.adm-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line-soft); }
+.adm-row.off { opacity: .55; }
+.adm-photo { position: relative; flex-shrink: 0; cursor: pointer; border-radius: 12px; overflow: hidden; }
+.adm-thumb { width: 72px; height: 72px; border-radius: 12px; }
+.adm-nophoto { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 11px; text-align: center; }
+.adm-photo-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; font-weight: 600; background: rgba(14,14,13,.72); color: var(--text); opacity: 0; transition: opacity .15s; padding: 4px; }
+.adm-photo:hover .adm-photo-hint, .adm-photo:focus-within .adm-photo-hint { opacity: 1; }
+.adm-name { background: none; border: none; padding: 0; color: var(--text); font-weight: 600; text-align: left; font-size: 15px; }
+.adm-name:hover { color: var(--accent); }
+.adm-price { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.adm-price .input { width: 96px; min-height: 42px; text-align: right; font-family: var(--display); font-size: 18px; }
+.adm-saved { width: 16px; color: var(--ok); font-weight: 700; }
+@media (max-width: 640px) {
+  .adm-row { flex-wrap: wrap; }
+  .adm-row > .stack { flex-basis: calc(100% - 90px); }
+  .adm-thumb { width: 64px; height: 64px; }
+}

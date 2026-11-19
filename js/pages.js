@@ -76,6 +76,7 @@ export const PAGES = {
   '/account': { title: 'Личный кабинет — Патрики Паб', noindex: true },
   '/cart': { title: 'Корзина — Патрики Паб', noindex: true },
   '/checkout': { title: 'Оформление заказа — Патрики Паб', noindex: true },
+  '/admin': { title: 'Админка меню — Патрики Паб', noindex: true },
 };
 for (const k of KINDS) PAGES['/events/' + k.id] = { title: k.seoTitle, desc: k.seoDesc };
 for (const p of VENUE_PAGES) PAGES['/' + p.slug] = { title: p.seoTitle, desc: p.seoDesc };

@@ -183,6 +183,7 @@ function render(scroll = true) {
   else if (VENUE_PAGES.some((p) => r === '/' + p.slug)) html = VenuePage(VENUE_PAGES.find((p) => r === '/' + p.slug));
   else if (r === '/login') html = Login();
   else if (r === '/account') html = Account();
+  else if (r === '/admin') html = '<div class="wrap page" id="adm-root"></div>';
   else html = `<div class="wrap page"><h1 class="h1">Страница не найдена</h1><a class="btn btn-accent" href="/" style="align-self:flex-start">На главную</a></div>`;
   app.innerHTML = html; delete app.dataset.prerendered;
   const changed = r !== lastRoute; lastRoute = r;
@@ -207,6 +208,12 @@ function after(r, changed) {
   if (r === '/checkout' && !S.loy) loadLoyalty();
   if (r.startsWith('/order/')) pollOrder(r.slice(7), changed);
   if (r === '/login') tickVerify();
+  if (r === '/admin') {
+    import('./admin.js').then((m) => m.mount(document.getElementById('adm-root'), {
+      store, toast, loader,
+      onMenu: (menu) => { Object.assign(S, { categories: menu.categories, items: menu.items, venues: menu.venues || S.venues }); },
+    })).catch((e) => { console.error(e); app.innerHTML = '<div class="wrap page"><h1 class="h2">Админка не загрузилась</h1><p class="lead">Обновите страницу.</p></div>'; });
+  }
   // якорь в адресе (#cat-smoker, #ev-form) — прокрутить к нему после отрисовки
   if (changed && location.hash.length > 1) { const id = decodeURIComponent(location.hash.slice(1)); setTimeout(() => document.getElementById(id)?.scrollIntoView(), 30); }
 }

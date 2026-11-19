@@ -200,7 +200,7 @@ function buildPages(D) {
   [...venueLds, crumbs([['/contacts', 'Контакты']])]);
 
   // служебные страницы: отдаём с кодом 200, но закрываем от индексации
-  for (const p of ['/login', '/account', '/cart', '/checkout']) add(p, '', []);
+  for (const p of ['/login', '/account', '/cart', '/checkout', '/admin']) add(p, '', []);
   return pages;
 }
 
@@ -252,6 +252,7 @@ Disallow: /cart/
 Disallow: /checkout/
 Disallow: /account/
 Disallow: /login/
+Disallow: /admin/
 Disallow: /order/
 Disallow: /pay-test/
 Disallow: /*?demo

@@ -4,6 +4,7 @@ Disallow: /cart/
 Disallow: /checkout/
 Disallow: /account/
 Disallow: /login/
+Disallow: /admin/
 Disallow: /order/
 Disallow: /pay-test/
 Disallow: /*?demo
