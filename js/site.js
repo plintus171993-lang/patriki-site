@@ -5,7 +5,11 @@ import { store } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
-import { KINDS, pageTitle } from './pages.js';
+import { KINDS, pageTitle, METRIKA_ID } from './pages.js';
+// Яндекс Метрика: просмотры страниц при переходах без перезагрузки и цели (бронь, заказ, заявка)
+const metrika = (...a) => { try { window.ym?.(METRIKA_ID, ...a); } catch { /* блокировщик рекламы */ } };
+const goal = (name, params) => metrika('reachGoal', name, params);
+let metrikaLast = location.href;
 
 /* ---------- утилиты ---------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -185,6 +189,7 @@ function render(scroll = true) {
   if (changed) {
     const n = r.startsWith('/news/') && (S.news || []).find((x) => x.id === r.slice(6));
     document.title = r === initialRoute ? initialTitle : n ? `${n.title} — Патрики Паб` : pageTitle(r);
+    if (location.href !== metrikaLast) { metrika('hit', location.href, { title: document.title, referer: metrikaLast }); metrikaLast = location.href; }
   }
   updateHead();
   after(r, changed);
@@ -499,6 +504,7 @@ async function submitCheckout(form) {
     const online = k.payment === 'online';
     S.orders.unshift({ id: res.id, number: res.number, total: res.total, status: 'new', payment: k.payment, payment_status: online ? 'pending' : 'none', at: Date.now() });
     S.orders = S.orders.slice(0, 20); keep.set('orders', S.orders);
+    goal('order', { order_price: res.total, currency: 'RUB', venue: S.venueId, payment: k.payment });
     S.cart = {}; keep.set('cart', S.cart);
     try {
       if (c.name.trim() !== S.profile.name || fmtPhone(c.phone) !== S.profile.phone) S.profile = await store.saveProfile({ ...S.profile, name: c.name, phone: fmtPhone(c.phone) });
@@ -662,6 +668,7 @@ async function submitBooking(form) {
       name: c.name.trim(), phone: fmtPhone(c.phone), comment: ((b.comment || '').trim() + ' (с сайта)').trim(), pd_consent: true, pd_consent_version: CV,
     });
     const vname = S.venues.find((x) => x.id === b.venue)?.name || '';
+    goal('booking', { venue: b.venue, guests: b.guests });
     S.booking = { guests: 2, day: '', time: '', comment: '', venue: '' }; S.bookings = null;
     showDone('Бронь отправлена', `Бронь №${res.number} — «${vname}». Паб подтвердит её звонком или сообщением.`, verified() ? '/account/' : '/login/', verified() ? 'Мои брони' : 'Войти, чтобы видеть брони');
   } catch (ex) { err.textContent = ex.message || 'Не удалось забронировать'; btn.disabled = false; btn.textContent = 'Забронировать'; }
@@ -778,6 +785,7 @@ async function submitEvent(form) {
       kind: e.kind, venue_id: e.venue || '', event_date: e.date || '', guests: e.guests || '', format: e.format || '', budget: (e.budget || '').trim(),
       name: e.name.trim(), phone: fmtPhone(e.phone), comment: (e.comment || '').trim(), pd_consent: true, pd_consent_version: CV, source: 'site',
     });
+    goal('event_request', { kind: e.kind, venue: e.venue || '' });
     S.ev = { kind: '', venue: '', format: '', sent: { number: res.number, phone: fmtPhone(e.phone) } }; S.myEvents = null;
     render();
   } catch (ex) { err.textContent = ex.message || 'Не получилось отправить. Позвоните нам, пожалуйста'; btn.disabled = false; btn.textContent = 'Отправить заявку'; }
@@ -937,6 +945,7 @@ async function finishVerify(r) {
   if (keep.get('pdConsent', '') === CV && S.profile.pd_consent_version !== CV) await grantPd('site-verify');
   const p10 = phone10(r.phone || S.me?.phone || '');
   if (p10 && phone10(S.profile.phone || '') !== p10) { try { S.profile = await store.saveProfile({ ...S.profile, phone: fmtPhone(p10) }); } catch (e) { console.warn(e); } }
+  goal('login');
   S.loy = null; S.bookings = null; S.history = null; S.myEvents = null;
   const back = S.verify.back || '/account';
   S.verify = { step: 'phone', phone: '', back: '/account' };

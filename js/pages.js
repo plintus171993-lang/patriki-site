@@ -3,6 +3,7 @@
 
 export const SITE_URL = 'https://xn----8sbemauele6bmft5j.xn--p1ai'; // веселый-патрик.рф
 export const BRAND = 'Патрики Паб';
+export const METRIKA_ID = 114362474; // Яндекс Метрика, аккаунт patrikkipab
 
 // Поводы для праздника — у каждого своя страница /events/<id>/
 export const KINDS = [
