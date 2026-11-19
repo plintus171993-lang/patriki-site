@@ -5,6 +5,7 @@ import { store } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
+import { KINDS, pageTitle } from './pages.js';
 
 /* ---------- утилиты ---------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -63,7 +64,7 @@ const icon = {
 const photo = (url, cls = '', alt = '') => url
   ? `<div class="photo ph ${cls}"><img src="${esc(url)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()"></div>`
   : `<div class="photo ph ${cls}" aria-hidden="true"></div>`;
-const loader = (t = 'Загружаем…') => `<div class="pk-loader" role="status"><img src="img/emblem.svg" alt=""><span>${esc(t)}</span></div>`;
+const loader = (t = 'Загружаем…') => `<div class="pk-loader" role="status"><img src="/img/emblem.svg" alt=""><span>${esc(t)}</span></div>`;
 const LEGAL = 'https://patrikipab.ru/legal/';
 const doc = (hash, text) => `<a href="${LEGAL}#${hash}" target="_blank" rel="noopener">${text}</a>`;
 
@@ -124,20 +125,43 @@ async function loadLoyalty(force = false) {
 const loyActive = () => S.loy && S.loy.settings?.enabled && (!S.loy.settings.verified_only || S.loy.verified);
 async function loadNews() {
   try { S.news = await store.listNews(); } catch (e) { console.warn(e); S.news = []; }
-  rerenderIf(['/', '/news', '/events']);
+  rerenderIf(['/', '/news', '/news/', '/events', '/events/']);
 }
 
 /* ---------- маршрутизация ---------- */
 const app = document.getElementById('app');
-const route = () => (location.hash.replace(/^#/, '').split('?')[0] || '/');
-const hashParams = () => new URLSearchParams(location.hash.split('?')[1] || '');
+// Настоящие адреса страниц (/menu/, /events/birthday/…) — их видят поисковики.
+// Маршрут внутри — без завершающего слэша: '/menu', '/news/<id>'.
+const route = () => (decodeURIComponent(location.pathname).replace(/\/index\.html$/, '').replace(/\/+$/, '') || '/');
+const qs = () => new URLSearchParams(location.search);
+const withSlash = (p) => { const [path, rest = ''] = String(p).split(/(?=[?#])/); return (path === '/' || path.endsWith('/') ? path : path + '/') + rest; };
+function go(p, replace = false) { history[replace ? 'replaceState' : 'pushState'](null, '', withSlash(p)); render(); }
+// Старые адреса вида /#/events?k=birthday (ссылки, закладки, возврат из оплаты Сбера) → /events/birthday/
+(function legacyHash() {
+  const h = location.hash;
+  if (!h.startsWith('#/')) return;
+  const [path, q = ''] = h.slice(1).split('?');
+  const p = new URLSearchParams(q);
+  let to = path || '/';
+  if (to === '/events' && p.get('k')) { to = '/events/' + p.get('k'); p.delete('k'); }
+  let anchor = '';
+  if ((to === '/menu' || to === '/delivery') && p.get('c')) { anchor = '#cat-' + p.get('c'); p.delete('c'); }
+  const rest = p.toString();
+  history.replaceState(null, '', withSlash(to) + (rest ? '?' + rest : '') + anchor);
+})();
+const initialRoute = route(), initialTitle = document.title;
 const rerenderIf = (list) => { const r = route(); if (list.some((x) => (x.endsWith('/') && x !== '/' ? r.startsWith(x) : r === x))) render(false); };
 let lastRoute = null;
 
 function render(scroll = true) {
   const r = route();
+  const evKind = r.startsWith('/events/') ? r.slice(8) : '';
   let html;
-  if (!S.ready) html = loader('Разжигаем смокер…');
+  if (!S.ready) {
+    // Пока грузится меню, оставляем готовый текст страницы, собранный при публикации
+    if (app.dataset.prerendered) return;
+    html = loader('Разжигаем смокер…');
+  }
   else if (r === '/') html = Home();
   else if (r === '/menu' || r === '/delivery') html = MenuPage(r === '/delivery');
   else if (r === '/cart') html = Cart();
@@ -145,27 +169,26 @@ function render(scroll = true) {
   else if (r.startsWith('/order/')) html = OrderStatus(r.slice(7));
   else if (r.startsWith('/pay-test/')) html = PayTest(r.slice(10));
   else if (r === '/booking') html = Booking();
-  else if (r === '/events') html = Events();
+  else if (r === '/events' || KINDS.some((k) => k.id === evKind)) {
+    if (evKind && r !== lastRoute) S.ev.kind = evKind;
+    html = Events(KINDS.find((k) => k.id === evKind));
+  }
   else if (r === '/news') html = News();
   else if (r.startsWith('/news/')) html = NewsItem(r.slice(6));
   else if (r === '/contacts') html = Contacts();
   else if (r === '/login') html = Login();
   else if (r === '/account') html = Account();
-  else html = `<div class="wrap page"><h1 class="h1">Страница не найдена</h1><a class="btn btn-accent" href="#/" style="align-self:flex-start">На главную</a></div>`;
-  app.innerHTML = html;
+  else html = `<div class="wrap page"><h1 class="h1">Страница не найдена</h1><a class="btn btn-accent" href="/" style="align-self:flex-start">На главную</a></div>`;
+  app.innerHTML = html; delete app.dataset.prerendered;
   const changed = r !== lastRoute; lastRoute = r;
-  if (changed && scroll) window.scrollTo({ top: 0, behavior: 'instant' });
-  if (changed) document.title = TITLES[r.split('/')[1] || ''] || TITLES[''];
+  if (changed && scroll && !location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
+  if (changed) {
+    const n = r.startsWith('/news/') && (S.news || []).find((x) => x.id === r.slice(6));
+    document.title = r === initialRoute ? initialTitle : n ? `${n.title} — Патрики Паб` : pageTitle(r);
+  }
   updateHead();
   after(r, changed);
 }
-const TITLES = {
-  '': 'Патрики Паб — ирландский паб в Санкт-Петербурге и Мурино: бронь, доставка, банкеты',
-  menu: 'Меню — Патрики Паб', delivery: 'Доставка из паба — Патрики Паб', booking: 'Бронь стола — Патрики Паб',
-  events: 'Банкеты, дни рождения, корпоративы и аренда зала — Патрики Паб', news: 'Новости и акции — Патрики Паб',
-  contacts: 'Контакты и адреса — Патрики Паб', login: 'Вход по номеру телефона — Патрики Паб', account: 'Личный кабинет — Патрики Паб',
-  cart: 'Корзина — Патрики Паб', checkout: 'Оформление заказа — Патрики Паб', order: 'Заказ — Патрики Паб',
-};
 
 function after(r, changed) {
   if (r === '/account') {
@@ -178,10 +201,8 @@ function after(r, changed) {
   if (r === '/checkout' && !S.loy) loadLoyalty();
   if (r.startsWith('/order/')) pollOrder(r.slice(7), changed);
   if (r === '/login') tickVerify();
-  if (r === '/events' && changed) {
-    const k = hashParams().get('k'); if (k && KINDS.some((x) => x.id === k)) { S.ev.kind = k; setTimeout(() => document.getElementById('ev-form')?.scrollIntoView(), 50); render(false); }
-  }
-  if ((r === '/menu' || r === '/delivery') && changed) { const c = hashParams().get('c'); if (c) setTimeout(() => document.getElementById('cat-' + c)?.scrollIntoView(), 30); }
+  // якорь в адресе (#cat-smoker, #ev-form) — прокрутить к нему после отрисовки
+  if (changed && location.hash.length > 1) { const id = decodeURIComponent(location.hash.slice(1)); setTimeout(() => document.getElementById(id)?.scrollIntoView(), 30); }
 }
 
 function updateHead() {
@@ -190,8 +211,8 @@ function updateHead() {
   if (hc) hc.innerHTML = icon.bag + (n ? `<span class="badge">${n}</span>` : '');
   const hl = document.getElementById('head-login');
   if (hl) {
-    if (verified()) { hl.href = '#/account'; hl.innerHTML = `${icon.user}<span>${loyActive() ? `${pts(S.loy.balance)} ${ptsWord(S.loy.balance)}` : 'Кабинет'}</span>`; }
-    else { hl.href = '#/login'; hl.innerHTML = `${icon.user}<span>Войти</span>`; }
+    if (verified()) { hl.href = '/account/'; hl.innerHTML = `${icon.user}<span>${loyActive() ? `${pts(S.loy.balance)} ${ptsWord(S.loy.balance)}` : 'Кабинет'}</span>`; }
+    else { hl.href = '/login/'; hl.innerHTML = `${icon.user}<span>Войти</span>`; }
   }
   const r = route();
   document.querySelectorAll('[data-nav]').forEach((a) => a.setAttribute('aria-current', r === a.dataset.nav ? 'page' : 'false'));
@@ -256,34 +277,34 @@ function Home() {
       <h1 class="h1">Мясо из <em>смокера</em>, пиво и праздники, которые помнят</h1>
       <p class="lead">Брискет, копчёные крылья, бургеры и пельмени ручной лепки. Забронируйте стол, закажите доставку или соберите своих на день рождения и корпоратив.</p>
       <div class="row" style="margin-top:6px">
-        <a class="btn btn-accent" href="#/booking">${icon.cal} Забронировать стол</a>
-        <a class="btn btn-outline" href="#/delivery">${icon.truck} Заказать доставку</a>
-        <a class="btn btn-ghost" href="#/events">${icon.party} Праздник у нас</a>
+        <a class="btn btn-accent" href="/booking/">${icon.cal} Забронировать стол</a>
+        <a class="btn btn-outline" href="/delivery/">${icon.truck} Заказать доставку</a>
+        <a class="btn btn-ghost" href="/events/">${icon.party} Праздник у нас</a>
       </div>
     </div>
   </section>
   <div class="wrap page">
     <section class="grid g4">
-      <a class="card card-link feature" href="#/delivery"><span class="ic">${icon.truck}</span><span class="h3">Доставка бесплатно</span><p>Примерно за ${esc(venue().eta_minutes || 45)} минут по Петроградской стороне. Оплата онлайн, картой или наличными.</p></a>
-      <a class="card card-link feature" href="#/booking"><span class="ic">${icon.cal}</span><span class="h3">Бронь за минуту</span><p>Выберите паб, дату, время и число гостей — администратор подтвердит бронь.</p></a>
-      <a class="card card-link feature" href="#/account"><span class="ic">${icon.card}</span><span class="h3">Карта гостя</span><p>${loyText()}</p></a>
-      <a class="card card-link feature" href="#/events"><span class="ic">${icon.party}</span><span class="h3">Банкеты и аренда</span><p>Дни рождения, корпоративы, свадьбы. Часть зала или весь паб — под ваш формат.</p></a>
+      <a class="card card-link feature" href="/delivery/"><span class="ic">${icon.truck}</span><span class="h3">Доставка бесплатно</span><p>Примерно за ${esc(venue().eta_minutes || 45)} минут по Петроградской стороне. Оплата онлайн, картой или наличными.</p></a>
+      <a class="card card-link feature" href="/booking/"><span class="ic">${icon.cal}</span><span class="h3">Бронь за минуту</span><p>Выберите паб, дату, время и число гостей — администратор подтвердит бронь.</p></a>
+      <a class="card card-link feature" href="/account/"><span class="ic">${icon.card}</span><span class="h3">Карта гостя</span><p>${loyText()}</p></a>
+      <a class="card card-link feature" href="/events/"><span class="ic">${icon.party}</span><span class="h3">Банкеты и аренда</span><p>Дни рождения, корпоративы, свадьбы. Часть зала или весь паб — под ваш формат.</p></a>
     </section>
 
     <section class="stack" style="gap:18px">
-      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Хиты паба</span><h2 class="h2">Из смокера и не только</h2></div><a href="#/menu">Всё меню →</a></div>
+      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Хиты паба</span><h2 class="h2">Из смокера и не только</h2></div><a href="/menu/">Всё меню →</a></div>
       <div class="dishes">${list.map(Dish).join('')}</div>
     </section>
 
     ${EventsTeaser()}
 
     ${news.length ? `<section class="stack" style="gap:18px">
-      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Новости и акции</span><h2 class="h2">Что у нас происходит</h2></div><a href="#/news">Все новости →</a></div>
+      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Новости и акции</span><h2 class="h2">Что у нас происходит</h2></div><a href="/news/">Все новости →</a></div>
       <div class="grid g3">${news.map(NewsCard).join('')}</div>
     </section>` : ''}
 
     <section class="stack" style="gap:18px">
-      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Где мы</span><h2 class="h2">Два паба</h2></div><a href="#/contacts">Контакты и карта →</a></div>
+      <div class="sec-head"><div class="stack" style="gap:4px"><span class="eyebrow accent">Где мы</span><h2 class="h2">Два паба</h2></div><a href="/contacts/">Контакты и карта →</a></div>
       <div class="grid g2">${S.venues.map((v) => VenueCard(v, false)).join('')}</div>
     </section>
 
@@ -321,7 +342,7 @@ function VenueCard(v, map = true) {
     <div class="row">
       ${v.phone ? `<a class="btn btn-ghost btn-sm" href="${telHref(v.phone)}">${icon.phone} ${esc(v.phone)}</a>` : ''}
       <a class="btn btn-ghost btn-sm" href="${esc(routeHref(v))}" target="_blank" rel="noopener">${icon.pin} Маршрут</a>
-      <a class="btn btn-accent btn-sm" href="#/booking" data-act="bk-venue-go" data-id="${esc(v.id)}">Забронировать</a>
+      <a class="btn btn-accent btn-sm" href="/booking/" data-act="bk-venue-go" data-id="${esc(v.id)}">Забронировать</a>
     </div>
   </article>`;
 }
@@ -343,10 +364,10 @@ function MenuPage(delivery) {
       ${VenueSwitch(delivery ? 'Откуда везём' : 'Меню и наличие в пабе')}
     </div>
     ${v.accepting === false ? `<div class="card" style="border-color:var(--accent)"><b>Паб «${esc(v.name)}» скоро откроется.</b> <span style="color:var(--text-2)">Заказ с доставкой пока можно оформить из паба «${esc(S.venues.find((x) => x.accepting !== false)?.name || '')}».</span></div>` : ''}
-    <div class="chips" role="navigation" aria-label="Разделы меню">${cats.map((c) => `<a class="chip" href="#${route()}?c=${esc(c.id)}" data-act="cat" data-id="${esc(c.id)}">${esc(c.name)}</a>`).join('')}</div>
+    <div class="chips" role="navigation" aria-label="Разделы меню">${cats.map((c) => `<a class="chip" href="#cat-${esc(c.id)}" data-act="cat" data-id="${esc(c.id)}">${esc(c.name)}</a>`).join('')}</div>
     <div class="menu-layout">
-      <nav class="cat-nav" aria-label="Разделы меню">${cats.map((c) => `<a href="#${route()}?c=${esc(c.id)}" data-act="cat" data-id="${esc(c.id)}">${esc(c.name)}</a>`).join('')}
-        ${cartCount() ? `<a class="btn btn-accent btn-sm" href="#/cart" style="margin-top:14px;color:#0E0E0D">Корзина · ${rub(cartSum())}</a>` : ''}</nav>
+      <nav class="cat-nav" aria-label="Разделы меню">${cats.map((c) => `<a href="#cat-${esc(c.id)}" data-act="cat" data-id="${esc(c.id)}">${esc(c.name)}</a>`).join('')}
+        ${cartCount() ? `<a class="btn btn-accent btn-sm" href="/cart/" style="margin-top:14px;color:#0E0E0D">Корзина · ${rub(cartSum())}</a>` : ''}</nav>
       <div>${cats.map((c) => `<section class="cat-block" id="cat-${esc(c.id)}"><h2 class="h3">${esc(c.name)}</h2>
         <div class="dishes">${S.items.filter((x) => x.category_id === c.id).map(Dish).join('')}</div></section>`).join('')}</div>
     </div>
@@ -358,13 +379,13 @@ const canOrder = () => cartCount() > 0 && venue().accepting !== false && !(venue
 function Cart() {
   const lines = cartLines(), v = venue();
   if (!lines.length) return `<div class="wrap page"><h1 class="h1">Корзина</h1>
-    <div class="empty">${icon.bag}<span>Пока пусто. Загляните в меню — там брискет и крылья из смокера.</span><a class="btn btn-accent" href="#/delivery">Открыть меню</a></div></div>`;
+    <div class="empty">${icon.bag}<span>Пока пусто. Загляните в меню — там брискет и крылья из смокера.</span><a class="btn btn-accent" href="/delivery/">Открыть меню</a></div></div>`;
   return `<div class="wrap page"><h1 class="h1">Корзина</h1>
     <div class="two-col">
       <div class="stack" style="gap:0">${lines.map(({ item, qty }) => `<div class="line">${photo(item.image_url, '', item.name)}
         <div class="stack" style="gap:2px;flex:1;min-width:0"><span style="font-weight:600">${esc(item.name)}</span><span class="muted small">${rub(item.price)} × ${qty}</span></div>
         ${Stepper(item.id, qty)}<b class="price" style="min-width:90px;text-align:right">${rub(item.price * qty)}</b></div>`).join('')}
-        <a href="#/delivery" class="btn btn-ghost btn-sm" style="align-self:flex-start;margin-top:16px">+ Добавить ещё</a>
+        <a href="/delivery/" class="btn btn-ghost btn-sm" style="align-self:flex-start;margin-top:16px">+ Добавить ещё</a>
       </div>
       <aside class="card stack">
         ${VenueSwitch('Откуда везём')}
@@ -372,13 +393,13 @@ function Cart() {
         <div class="sum-row"><span>Доставка</span><span>${v.delivery_fee ? rub(v.delivery_fee) : 'бесплатно'}</span></div>
         <div class="total"><span class="h3">Итого</span><b>${rub(cartSum() + (v.delivery_fee || 0))}</b></div>
         ${v.accepting === false ? `<span class="error">«${esc(v.name)}» пока не принимает заказы — выберите другой паб</span>` : v.min_order && cartSum() < v.min_order ? `<span class="error">Минимальный заказ — ${rub(v.min_order)}</span>` : ''}
-        <a class="btn btn-accent btn-block" href="#/checkout" ${canOrder() ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:.45"'}>Оформить заказ</a>
+        <a class="btn btn-accent btn-block" href="/checkout/" ${canOrder() ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:.45"'}>Оформить заказ</a>
       </aside>
     </div></div>`;
 }
 
 function Checkout() {
-  if (!canOrder()) { setTimeout(() => { location.hash = '#/cart'; }); return ''; }
+  if (!canOrder()) { setTimeout(() => { go('/cart'); }); return ''; }
   const k = S.checkout, v = venue(), d = S.draftAddr;
   if (k.payment === 'online' && !v.pay_online) k.payment = 'card';
   if (!k.payChosen && v.pay_online) k.payment = 'online';
@@ -392,7 +413,7 @@ function Checkout() {
   const noEarn = redeem > 0 && st.accrue_if_redeem === false;
   const earn = !noEarn && loyActive() && st.app_enabled && cartSum() - redeem >= Math.max(st.app_min_order || 0, 1) ? Math.floor((cartSum() - redeem) * (S.loy.tier?.pct || 0) / 100) : 0;
   return `<div class="wrap page">
-    <div class="row"><a class="icon-btn" href="#/cart" aria-label="Назад в корзину">${icon.back}</a><h1 class="h1" style="font-size:clamp(30px,4vw,44px)">Оформление</h1></div>
+    <div class="row"><a class="icon-btn" href="/cart/" aria-label="Назад в корзину">${icon.back}</a><h1 class="h1" style="font-size:clamp(30px,4vw,44px)">Оформление</h1></div>
     <form id="checkout" class="two-col" novalidate>
       <div class="stack" style="gap:26px">
         <section class="stack">${VenueSwitch('Откуда везём')}<span class="muted small">Заказ получит паб «${esc(v.name)}» — доставка: ${esc(v.zone || '')}.</span></section>
@@ -413,7 +434,7 @@ function Checkout() {
             <label class="field">Имя<input class="input" name="name" autocomplete="name" required value="${esc(c.name)}"></label>
             <label class="field">Телефон<input class="input" name="phone" type="tel" autocomplete="tel" data-phone required placeholder="${PHONE_PH}" value="${esc(fmtPhone(c.phone))}"></label>
           </div>
-          ${verified() && phone10(c.phone) === phone10(S.me.phone) ? `<span class="ok-note">${icon.check} Номер подтверждён</span>` : !verified() ? `<span class="muted small"><a href="#/login" data-act="login-from" data-back="/checkout">Войдите по номеру</a> — заказ попадёт в историю, а баллы начислятся на карту гостя.</span>` : ''}
+          ${verified() && phone10(c.phone) === phone10(S.me.phone) ? `<span class="ok-note">${icon.check} Номер подтверждён</span>` : !verified() ? `<span class="muted small"><a href="/login/" data-act="login-from" data-back="/checkout">Войдите по номеру</a> — заказ попадёт в историю, а баллы начислятся на карту гостя.</span>` : ''}
           <label class="check"><input type="checkbox" name="noCall" ${k.noCall ? 'checked' : ''}><span>Не звонить для подтверждения заказа</span></label>
         </section>
         <section class="stack"><span class="eyebrow">Когда</span>
@@ -486,7 +507,7 @@ async function submitCheckout(form) {
       S.addresses = await store.listAddresses();
     } catch (e2) { console.warn(e2); }
     S.history = null; S.loy = null; S.draftContact = null; S.checkout = { ...S.checkout, addr: null, comment: '', noCall: false, pdTick: false, useBonus: false };
-    location.hash = '#/order/' + res.id;
+    go('/order/' + res.id);
     if (online) payNow(res.id);
   } catch (ex) {
     console.error(ex);
@@ -513,7 +534,7 @@ function PaymentBlock(o) {
 async function payNow(id, btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'Открываем оплату…'; }
   try {
-    const r = await store.startPayment(id, location.origin + location.pathname);
+    const r = await store.startPayment(id, location.origin + '/');
     if (r.formUrl) { location.href = r.formUrl; return; }
     if (r.already) { const o = S.orders.find((x) => x.id === id); if (o) o.payment_status = r.already; render(false); }
   } catch (ex) { toast('Не удалось открыть оплату: ' + ex.message, 4000); if (btn) { btn.disabled = false; btn.textContent = 'Оплатить'; } }
@@ -537,7 +558,7 @@ function OrderStatus(id) {
     ${waitingPay ? '' : o.status === 'cancelled' ? '<div class="card"><span class="error">Заказ отменён. Если это ошибка — позвоните нам.</span></div>'
       : `<div class="card steps" aria-live="polite">${STATUS.map(([, label], i) => `<div class="step ${i <= idx ? 'done' : ''}"><span class="dot"></span>${label}</div>`).join('')}</div>`}
     <p class="muted" style="margin:0">Статус обновляется сам.</p>
-    <div class="row"><a class="btn btn-ghost" href="${telHref(venue().phone)}">${icon.phone} Позвонить в паб</a><a class="btn btn-accent" href="#/menu">Вернуться в меню</a></div>
+    <div class="row"><a class="btn btn-ghost" href="${telHref(venue().phone)}">${icon.phone} Позвонить в паб</a><a class="btn btn-accent" href="/menu/">Вернуться в меню</a></div>
   </div>`;
 }
 let pollTimer = null;
@@ -556,13 +577,13 @@ function pollOrder(id, now) {
       if (s && o && (s.status !== o.status || ps !== o.payment_status || !o.payment || o.number === '…')) {
         Object.assign(o, { status: s.status, number: s.number ?? o.number, payment: s.payment, payment_status: ps, total: s.total ?? o.total });
         keep.set('orders', S.orders);
-        if (hashParams().has('pay')) history.replaceState(null, '', location.pathname + '#/order/' + id);
+        if (qs().has('pay')) history.replaceState(null, '', '/order/' + id + '/');
         render(false); return;
       }
     } catch { /* сеть */ }
-    if (hashParams().has('pay')) history.replaceState(null, '', location.pathname + '#/order/' + id);
+    if (qs().has('pay')) history.replaceState(null, '', '/order/' + id + '/');
     pollOrder(id, false);
-  }, now || hashParams().has('pay') ? 300 : payWait ? 4000 : 15000);
+  }, now || qs().has('pay') ? 300 : payWait ? 4000 : 15000);
 }
 
 /* ---------- бронь стола ---------- */
@@ -589,13 +610,13 @@ function Booking() {
     <div class="seg${b.venue ? '' : ' need'}" role="radiogroup">${S.venues.map((v) => `<button type="button" role="radio" data-act="bk-venue" data-id="${esc(v.id)}" aria-pressed="${v.id === b.venue}" aria-checked="${v.id === b.venue}">${esc(v.name)}<small>${esc(v.address)}</small></button>`).join('')}</div>
     ${b.venue ? '' : '<span class="small" style="color:var(--accent)">Нажмите на паб, в котором хотите забронировать стол</span>'}</section>`;
   const head = `<div class="stack" style="gap:8px"><span class="eyebrow accent">Бронь стола</span><h1 class="h1">Забронировать стол</h1>
-    <p class="lead">Бронь бесплатная. Паб подтвердит её звонком или сообщением; держим стол 15 минут после назначенного времени. Компания больше 12 человек или праздник — <a href="#/events">оставьте заявку на банкет</a>.</p></div>`;
+    <p class="lead">Бронь бесплатная. Паб подтвердит её звонком или сообщением; держим стол 15 минут после назначенного времени. Компания больше 12 человек или праздник — <a href="/events/">оставьте заявку на банкет</a>.</p></div>`;
   if (!b.venue) return `<div class="wrap page" style="max-width:860px">${head}${pick}</div>`;
   const v = S.venues.find((x) => x.id === b.venue);
   if (v.booking_enabled === false || v.accepting === false) return `<div class="wrap page" style="max-width:860px">${head}${pick}
     <div class="card stack"><b>«${esc(v.name)}» скоро открывается — бронь столов начнём принимать после открытия.</b>
     <span style="color:var(--text-2)">Планируете праздник? Заявку на банкет можно оставить уже сейчас.</span>
-    <div class="row"><a class="btn btn-accent btn-sm" href="#/events">Заявка на мероприятие</a>${v.phone ? `<a class="btn btn-ghost btn-sm" href="${telHref(v.phone)}">${icon.phone} ${esc(v.phone)}</a>` : ''}</div></div></div>`;
+    <div class="row"><a class="btn btn-accent btn-sm" href="/events/">Заявка на мероприятие</a>${v.phone ? `<a class="btn btn-ghost btn-sm" href="${telHref(v.phone)}">${icon.phone} ${esc(v.phone)}</a>` : ''}</div></div></div>`;
   const days = bookingDays();
   if (!b.day || !days.some((d) => d.key === b.day)) b.day = days[0].key;
   let slots = bookingSlots(b.day);
@@ -608,7 +629,7 @@ function Booking() {
       <section class="stack"><span class="eyebrow">Время</span><div class="slots">${slots.map((t) => `<button type="button" class="opt" data-act="bk-time" data-v="${t}" aria-pressed="${t === b.time}">${t}</button>`).join('')}</div></section>
       <section class="stack"><span class="eyebrow">Гостей</span>
         <div class="row" style="gap:14px"><button type="button" class="icon-btn" data-act="bk-g" data-v="-1" aria-label="Меньше">−</button><b style="font-size:24px;min-width:32px;text-align:center">${b.guests}</b>
-        <button type="button" class="icon-btn" data-act="bk-g" data-v="1" aria-label="Больше" ${b.guests >= max ? 'disabled' : ''}>+</button><span class="muted small">больше ${max} — <a href="#/events?k=banquet">заявка на банкет</a></span></div></section>
+        <button type="button" class="icon-btn" data-act="bk-g" data-v="1" aria-label="Больше" ${b.guests >= max ? 'disabled' : ''}>+</button><span class="muted small">больше ${max} — <a href="/events/banquet/">заявка на банкет</a></span></div></section>
       <section class="stack"><span class="eyebrow">Контакты</span>
         <div class="form-grid">
           <label class="field">Имя<input class="input" name="name" autocomplete="given-name" required value="${esc(c.name || S.profile.name || '')}"></label>
@@ -642,56 +663,49 @@ async function submitBooking(form) {
     });
     const vname = S.venues.find((x) => x.id === b.venue)?.name || '';
     S.booking = { guests: 2, day: '', time: '', comment: '', venue: '' }; S.bookings = null;
-    showDone('Бронь отправлена', `Бронь №${res.number} — «${vname}». Паб подтвердит её звонком или сообщением.`, verified() ? '#/account' : '#/login', verified() ? 'Мои брони' : 'Войти, чтобы видеть брони');
+    showDone('Бронь отправлена', `Бронь №${res.number} — «${vname}». Паб подтвердит её звонком или сообщением.`, verified() ? '/account/' : '/login/', verified() ? 'Мои брони' : 'Войти, чтобы видеть брони');
   } catch (ex) { err.textContent = ex.message || 'Не удалось забронировать'; btn.disabled = false; btn.textContent = 'Забронировать'; }
 }
 function showDone(title, text, href, label) {
   const wrap = document.createElement('div'); wrap.className = 'modal-wrap';
   wrap.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="mb" style="align-items:center;text-align:center;padding:36px 28px">
-    <img src="img/emblem.svg" width="90" height="90" alt=""><h2 class="h2">${esc(title)}</h2><p style="margin:0;color:var(--text-2)">${esc(text)}</p>
+    <img src="/img/emblem.svg" width="90" height="90" alt=""><h2 class="h2">${esc(title)}</h2><p style="margin:0;color:var(--text-2)">${esc(text)}</p>
     <div class="row" style="justify-content:center;margin-top:8px"><button type="button" class="btn btn-ghost" data-close>Хорошо</button>${href ? `<a class="btn btn-accent" href="${href}" data-close>${esc(label)}</a>` : ''}</div></div></div>`;
   wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.closest('[data-close]')) setTimeout(() => wrap.remove(), 30); });
   document.body.appendChild(wrap);
-  location.hash = '#/';
+  go('/');
 }
 
 /* ---------- мероприятия: банкеты, дни рождения, корпоративы, аренда ---------- */
-const KINDS = [
-  { id: 'birthday', em: '🎂', title: 'День рождения', text: 'Стол или отдельная зона для вашей компании, сеты из смокера и торт, который можно принести с собой — обсудим заранее.' },
-  { id: 'corporate', em: '🍻', title: 'Корпоратив', text: 'Новогодние и летние вечеринки, тимбилдинги, встречи с партнёрами. Подберём меню под бюджет на человека и закроем документы для бухгалтерии.' },
-  { id: 'wedding', em: '💍', title: 'Свадьба', text: 'Камерная свадьба или after-party в атмосфере ирландского паба. Банкетное меню, рассадка и оформление — под ваш сценарий.' },
-  { id: 'banquet', em: '🥩', title: 'Банкет и выпускной', text: 'Юбилеи, выпускные, встречи выпускников и любые поводы собраться большой компанией. Сеты BBQ, закуски к пиву, горячее.' },
-  { id: 'rent', em: '🔑', title: 'Аренда зала', text: 'Часть зала или весь паб под закрытое мероприятие: презентация, трансляция, вечеринка, съёмка. Условия — по дате и числу гостей.' },
-  { id: 'other', em: '✨', title: 'Свой формат', text: 'Квиз, турнир, просмотр матча, мальчишник или девичник — расскажите идею, а мы предложим, как её провести.' },
-];
 const FORMATS = ['Стол или зона в зале', 'Часть зала', 'Весь паб (закрытое мероприятие)', 'Пока не знаю — посоветуйте'];
 function EventsTeaser() {
   return `<section class="ev-hero">
     <div class="hero-bg" style="background-image:url('${esc(HERO_IMG)}')"></div>
     <div class="in"><span class="eyebrow accent">Праздники и аренда</span><h2 class="h2" style="font-size:clamp(28px,4vw,44px)">Отмечайте у нас: дни рождения, корпоративы, свадьбы</h2>
       <p class="lead">Отдаём под ваш праздник стол, часть зала или весь паб. Банкетное меню из смокера, пиво и атмосфера, ради которой возвращаются.</p>
-      <div class="row">${KINDS.slice(0, 4).map((k) => `<a class="tag" href="#/events?k=${k.id}" style="text-decoration:none">${k.em} ${esc(k.title)}</a>`).join('')}</div>
-      <a class="btn btn-accent" href="#/events" style="align-self:flex-start">Обсудить мероприятие</a></div>
+      <div class="row">${KINDS.slice(0, 4).map((k) => `<a class="tag" href="/events/${k.id}/" style="text-decoration:none">${k.em} ${esc(k.title)}</a>`).join('')}</div>
+      <a class="btn btn-accent" href="/events/" style="align-self:flex-start">Обсудить мероприятие</a></div>
   </section>`;
 }
-function Events() {
+function Events(kind) {
   const e = S.ev;
   const evNews = (S.news || []).filter((n) => n.kind === 'event');
   if (e.sent) return `<div class="wrap page" style="max-width:720px"><div class="card stack" style="align-items:center;text-align:center;padding:40px 28px;gap:14px">
-    <img src="img/emblem.svg" width="96" height="96" alt=""><span class="eyebrow accent">Заявка №${esc(e.sent.number)}</span><h1 class="h2">Спасибо! Заявка у нас</h1>
+    <img src="/img/emblem.svg" width="96" height="96" alt=""><span class="eyebrow accent">Заявка №${esc(e.sent.number)}</span><h1 class="h2">Спасибо! Заявка у нас</h1>
     <p style="margin:0;color:var(--text-2)">Менеджер паба свяжется с вами по номеру ${esc(e.sent.phone)}, уточнит детали и предложит меню. Обычно перезваниваем в течение дня.</p>
-    <div class="row" style="justify-content:center"><button type="button" class="btn btn-ghost" data-act="ev-again">Ещё одна заявка</button><a class="btn btn-accent" href="#/menu">Посмотреть меню</a></div></div></div>`;
+    <div class="row" style="justify-content:center"><button type="button" class="btn btn-ghost" data-act="ev-again">Ещё одна заявка</button><a class="btn btn-accent" href="/menu/">Посмотреть меню</a></div></div></div>`;
   return `<div class="wrap page">
     <section class="ev-hero" style="min-height:420px">
       <div class="hero-bg" style="background-image:url('${esc(HERO_IMG)}')"></div>
-      <div class="in"><span class="eyebrow accent">Банкеты и аренда зала</span>
+      <div class="in">${kind ? `<a class="eyebrow accent" href="/events/" style="text-decoration:none">← Банкеты и аренда зала</a>
+        <h1 class="h1">${esc(kind.h1)}</h1><p class="lead">${esc(kind.lead)}</p>` : `<span class="eyebrow accent">Банкеты и аренда зала</span>
         <h1 class="h1">Ваш праздник — в «Патрики»</h1>
-        <p class="lead">Дни рождения, корпоративы, свадьбы, выпускные и закрытые вечеринки на Петроградке и в Мурино. Отдадим под вас стол, часть зала или весь паб.</p>
-        <div class="row"><a class="btn btn-accent" href="#/events" data-act="ev-scroll">Оставить заявку</a><a class="btn btn-outline" href="${telHref(S.venues[0]?.phone || '+79633027595')}">${icon.phone} ${esc(S.venues[0]?.phone || '+7 963 302-75-95')}</a></div></div>
+        <p class="lead">Дни рождения, корпоративы, свадьбы, выпускные и закрытые вечеринки на Петроградке и в Мурино. Отдадим под вас стол, часть зала или весь паб.</p>`}
+        <div class="row"><a class="btn btn-accent" href="#ev-form" data-act="ev-scroll">Оставить заявку</a><a class="btn btn-outline" href="${telHref(S.venues[0]?.phone || '+79633027595')}">${icon.phone} ${esc(S.venues[0]?.phone || '+7 963 302-75-95')}</a></div></div>
     </section>
 
-    <section class="stack" style="gap:18px"><div class="stack" style="gap:4px"><span class="eyebrow accent">Форматы</span><h2 class="h2">Под какой повод</h2></div>
-      <div class="grid g3">${KINDS.map((k) => `<article class="card format"><span class="em" aria-hidden="true">${k.em}</span><span class="h3">${esc(k.title)}</span><p>${esc(k.text)}</p>
+    <section class="stack" style="gap:18px"><div class="stack" style="gap:4px"><span class="eyebrow accent">Форматы</span><h2 class="h2">${kind ? 'Другие поводы' : 'Под какой повод'}</h2></div>
+      <div class="grid g3">${KINDS.map((k) => `<article class="card format"><span class="em" aria-hidden="true">${k.em}</span><a class="h3" href="/events/${k.id}/" style="text-decoration:none;color:inherit">${esc(k.title)}</a><p>${esc(k.text)}</p>
         <button type="button" class="btn btn-ghost btn-sm" data-act="ev-kind" data-v="${k.id}">Выбрать</button></article>`).join('')}</div></section>
 
     <section class="grid g2" style="gap:24px;align-items:start">
@@ -774,8 +788,8 @@ const NEWS_KIND = { news: 'Новость', promo: 'Акция', event: 'Афи�
 const fmtDate = (iso, opt = { day: 'numeric', month: 'long' }) => new Date(iso).toLocaleDateString('ru-RU', { ...opt, timeZone: 'Europe/Moscow' });
 function NewsCard(n) {
   const vn = n.venue_id ? S.venues.find((v) => v.id === n.venue_id)?.name : '';
-  return `<a class="card card-link news-card" href="#/news/${esc(n.id)}">
-    ${n.image_url ? photo(n.image_url, '', n.title) : '<div class="news-banner"><img src="img/emblem.svg" alt=""></div>'}
+  return `<a class="card card-link news-card" href="/news/${esc(n.id)}/">
+    ${n.image_url ? photo(n.image_url, '', n.title) : '<div class="news-banner"><img src="/img/emblem.svg" alt=""></div>'}
     <div class="nb"><div class="row" style="gap:8px"><span class="pill ${n.kind === 'promo' ? 'gold' : ''}">${NEWS_KIND[n.kind] || 'Новость'}</span>${vn ? `<span class="pill">${esc(vn)}</span>` : ''}</div>
       <span class="h3" style="font-size:19px">${esc(n.title)}</span><p>${esc(n.body)}</p>
       <div class="between"><span class="muted small">${n.kind === 'event' && n.event_at ? fmtDate(n.event_at, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : n.ends_on ? `до ${fmtDate(n.ends_on)}` : fmtDate(n.created_at)}</span><span class="small">Подробнее →</span></div></div></a>`;
@@ -793,17 +807,17 @@ function News() {
 function NewsItem(id) {
   if (S.news === null) return `<div class="wrap page">${loader()}</div>`;
   const n = S.news.find((x) => x.id === id);
-  if (!n) return `<div class="wrap page"><h1 class="h2">Новость не найдена</h1><a class="btn btn-accent" href="#/news" style="align-self:flex-start">Все новости</a></div>`;
+  if (!n) return `<div class="wrap page"><h1 class="h2">Новость не найдена</h1><a class="btn btn-accent" href="/news/" style="align-self:flex-start">Все новости</a></div>`;
   const vn = n.venue_id ? S.venues.find((v) => v.id === n.venue_id)?.name : '';
   return `<div class="wrap page"><article class="article">
-    <a href="#/news" class="small" style="text-decoration:none">← Все новости и акции</a>
+    <a href="/news/" class="small" style="text-decoration:none">← Все новости и акции</a>
     <div class="row" style="gap:8px"><span class="pill ${n.kind === 'promo' ? 'gold' : ''}">${NEWS_KIND[n.kind] || 'Новость'}</span>${vn ? `<span class="pill">${esc(vn)}</span>` : ''}
       <span class="muted small">${n.kind === 'event' && n.event_at ? fmtDate(n.event_at, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : fmtDate(n.created_at, { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
     <h1 class="h1" style="font-size:clamp(30px,4vw,48px)">${esc(n.title)}</h1>
     ${n.image_url ? photo(n.image_url, '', n.title) : ''}
     <div class="body">${esc(n.body)}</div>
     ${n.ends_on ? `<span class="muted small">Действует до ${fmtDate(n.ends_on, { day: 'numeric', month: 'long', year: 'numeric' })}</span>` : ''}
-    <div class="row">${n.kind === 'event' ? '<a class="btn btn-accent" href="#/booking">Забронировать стол</a>' : '<a class="btn btn-accent" href="#/delivery">Заказать доставку</a>'}<a class="btn btn-ghost" href="#/events">Праздник у нас</a></div>
+    <div class="row">${n.kind === 'event' ? '<a class="btn btn-accent" href="/booking/">Забронировать стол</a>' : '<a class="btn btn-accent" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Праздник у нас</a></div>
   </article></div>`;
 }
 
@@ -827,8 +841,8 @@ function Contacts() {
 /* ---------- вход по номеру телефона ---------- */
 function Login() {
   const v = S.verify;
-  if (verified() && v.step === 'phone') { setTimeout(() => { location.hash = '#' + (v.back || '/account'); }); return ''; }
-  const head = (t) => `<div class="stack" style="gap:8px;align-items:center;text-align:center"><img src="img/emblem.svg" width="86" height="86" alt=""><h1 class="h2">${t}</h1></div>`;
+  if (verified() && v.step === 'phone') { setTimeout(() => { go(v.back || '/account', true); }); return ''; }
+  const head = (t) => `<div class="stack" style="gap:8px;align-items:center;text-align:center"><img src="/img/emblem.svg" width="86" height="86" alt=""><h1 class="h2">${t}</h1></div>`;
   if (v.step === 'tg') {
     return `<div class="wrap page"><div class="login-box">${head('Вход через Telegram')}
       <ol style="color:var(--text-2);margin:0;padding-left:20px;line-height:1.8">
@@ -928,7 +942,7 @@ async function finishVerify(r) {
   S.verify = { step: 'phone', phone: '', back: '/account' };
   toast(r.status === 'login' ? 'Готово — вошли в ваш профиль' : 'Номер подтверждён', 3500);
   loadLoyalty(true);
-  location.hash = '#' + back;
+  go(back);
 }
 
 /* ---------- личный кабинет ---------- */
@@ -937,7 +951,7 @@ const LOY_SRC = { app: 'заказ', venue: 'в пабе', pos: 'касса', ad
 const BK_RU = { new: 'ждёт подтверждения', confirmed: 'подтверждена', cancelled: 'отменена', done: 'состоялась', no_show: 'не пришли', rejected: 'отклонена' };
 const EV_RU = { new: 'новая', in_work: 'в работе', done: 'проведено', cancelled: 'отменена' };
 function Account() {
-  if (!verified()) { S.verify.back = '/account'; setTimeout(() => { location.hash = '#/login'; }); return ''; }
+  if (!verified()) { S.verify.back = '/account'; setTimeout(() => { go('/login'); }); return ''; }
   const t = S.accTab;
   const tab = (id, l) => `<button type="button" class="chip" data-act="acc-tab" data-v="${id}" aria-pressed="${t === id}">${l}</button>`;
   return `<div class="wrap page">
@@ -959,7 +973,7 @@ function AccCard() {
   return `<div class="grid g2" style="gap:24px;align-items:start">
     <div class="stack" style="gap:16px">
       <section class="loy-card">
-        <div class="between"><div class="stack" style="gap:4px"><span class="eyebrow accent">${esc(t.name || '')} · ${esc(t.pct ?? 0)}%</span><span class="loy-balance">${pts(L.balance)} <small>${ptsWord(L.balance)}</small></span></div><img src="img/emblem.svg" width="58" height="58" alt=""></div>
+        <div class="between"><div class="stack" style="gap:4px"><span class="eyebrow accent">${esc(t.name || '')} · ${esc(t.pct ?? 0)}%</span><span class="loy-balance">${pts(L.balance)} <small>${ptsWord(L.balance)}</small></span></div><img src="/img/emblem.svg" width="58" height="58" alt=""></div>
         ${t.fixed ? '' : t.next_from != null ? `<div class="loy-prog"><span style="width:${prog}%"></span></div><span class="muted small">До уровня «${esc(t.next_name)}» — ещё ${rub(need)} покупок</span>` : '<span class="muted small">Максимальный уровень — спасибо, что вы с нами!</span>'}
         ${L.pending ? `<span class="muted small">+${pts(L.pending)} ${ptsWord(L.pending)} в пути — начислятся через ${esc(st.accrue_delay_days || 0)} дн.</span>` : ''}
         <span class="loy-no">№ ${esc(String(L.card_no).replace(/(\d{4})(\d{4})/, '$1 $2'))}</span>
@@ -989,22 +1003,22 @@ function startCardQr() {
 function AccBookings() {
   if (!S.bookings) return loader();
   const active = (b) => ['new', 'confirmed'].includes(b.status) && new Date(b.starts_at) > Date.now();
-  if (!S.bookings.length) return `<div class="empty">${icon.cal}<span>Броней пока нет.</span><a class="btn btn-accent" href="#/booking">Забронировать стол</a></div>`;
+  if (!S.bookings.length) return `<div class="empty">${icon.cal}<span>Броней пока нет.</span><a class="btn btn-accent" href="/booking/">Забронировать стол</a></div>`;
   return `<div class="card">${S.bookings.map((b) => `<div class="list-row"><span class="stack" style="gap:2px"><b>№${esc(b.number)} · ${esc(S.venues.find((v) => v.id === b.venue_id)?.name || '')}</b>
     <span class="muted small">${new Date(b.starts_at).toLocaleString('ru-RU', { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' })} · ${esc(b.guests)} чел.</span></span>
     <span class="row" style="gap:8px"><span class="pill ${b.status === 'confirmed' ? 'ok' : b.status === 'new' ? 'gold' : ''}">${BK_RU[b.status] || esc(b.status)}</span>${active(b) ? `<button type="button" class="btn btn-danger btn-sm" data-act="bk-cancel" data-id="${esc(b.id)}">Отменить</button>` : ''}</span></div>`).join('')}</div>
-    <a class="btn btn-accent" href="#/booking" style="align-self:flex-start">Новая бронь</a>`;
+    <a class="btn btn-accent" href="/booking/" style="align-self:flex-start">Новая бронь</a>`;
 }
 function AccOrders() {
   if (!S.history) return loader();
-  if (!S.history.length) return `<div class="empty">${icon.bag}<span>Заказов пока нет. Самое время попробовать брискет.</span><a class="btn btn-accent" href="#/delivery">В меню</a></div>`;
+  if (!S.history.length) return `<div class="empty">${icon.bag}<span>Заказов пока нет. Самое время попробовать брискет.</span><a class="btn btn-accent" href="/delivery/">В меню</a></div>`;
   return `<div class="card">${S.history.map((o) => `<div class="list-row"><span class="stack" style="gap:2px"><b>№${esc(o.number)} · ${rub(o.total)}</b>
     <span class="muted small">${fmtDate(o.created_at, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} · ${esc((o.items || []).map((l) => l.name).slice(0, 3).join(', '))}</span></span>
     <span class="row" style="gap:8px"><span class="pill">${STATUS_RU[o.status] || esc(o.status)}</span><button type="button" class="btn btn-ghost btn-sm" data-act="repeat" data-id="${esc(o.id)}">Повторить</button></span></div>`).join('')}</div>`;
 }
 function AccEvents() {
   if (!S.myEvents) return loader();
-  if (!S.myEvents.length) return `<div class="empty">${icon.party}<span>Заявок на мероприятия пока нет.</span><a class="btn btn-accent" href="#/events">Обсудить праздник</a></div>`;
+  if (!S.myEvents.length) return `<div class="empty">${icon.party}<span>Заявок на мероприятия пока нет.</span><a class="btn btn-accent" href="/events/">Обсудить праздник</a></div>`;
   return `<div class="card">${S.myEvents.map((e) => `<div class="list-row"><span class="stack" style="gap:2px"><b>№${esc(e.number)} · ${esc(KINDS.find((k) => k.id === e.kind)?.title || 'Мероприятие')}</b>
     <span class="muted small">${e.event_date ? fmtDate(e.event_date) : 'дата не выбрана'}${e.guests ? ` · ${esc(e.guests)} гостей` : ''}${e.venue_id ? ` · ${esc(S.venues.find((v) => v.id === e.venue_id)?.name || '')}` : ''}</span></span>
     <span class="pill ${e.status === 'in_work' ? 'gold' : e.status === 'done' ? 'ok' : ''}">${EV_RU[e.status] || esc(e.status)}</span></div>`).join('')}</div>`;
@@ -1026,7 +1040,7 @@ document.addEventListener('click', async (e) => {
     burger: () => {
       const w = document.createElement('div'); w.className = 'drawer-wrap';
       w.innerHTML = `<nav class="drawer" aria-label="Разделы"><div class="between" style="margin-bottom:8px"><span class="eyebrow accent">Разделы</span><button type="button" class="icon-btn" data-close aria-label="Закрыть">${icon.x}</button></div>
-        ${[['/menu', 'Меню'], ['/delivery', 'Доставка'], ['/booking', 'Бронь стола'], ['/events', 'Банкеты и аренда'], ['/news', 'Новости и акции'], ['/contacts', 'Контакты'], [verified() ? '/account' : '/login', verified() ? 'Личный кабинет' : 'Войти']].map(([h, l]) => `<a class="dl" href="#${h}">${l}</a>`).join('')}
+        ${[['/menu', 'Меню'], ['/delivery', 'Доставка'], ['/booking', 'Бронь стола'], ['/events', 'Банкеты и аренда'], ['/news', 'Новости и акции'], ['/contacts', 'Контакты'], [verified() ? '/account' : '/login', verified() ? 'Личный кабинет' : 'Войти']].map(([h, l]) => `<a class="dl" href="${h}/">${l}</a>`).join('')}
         <a class="btn btn-accent" href="tel:+79633027595" style="margin-top:18px">${icon.phone} +7 963 302-75-95</a></nav>`;
       w.addEventListener('click', (ev) => { if (ev.target === w || ev.target.closest('[data-close]') || ev.target.closest('a')) setTimeout(() => w.remove(), 20); });
       document.body.appendChild(w);
@@ -1042,7 +1056,7 @@ document.addEventListener('click', async (e) => {
     bonus: () => { saveCheckoutForm(); render(false); },
     'login-from': () => { saveCheckoutForm(); S.verify.back = el.dataset.back || '/account'; },
     'pay-now': () => payNow(id, el),
-    'mock-pay': async () => { el.disabled = true; try { const r = await store.mockPay(id, v); const o = S.orders.find((x) => x.id === id); if (o) o.payment_status = r.payment_status; keep.set('orders', S.orders); } catch (ex) { toast(ex.message); } location.hash = '#/order/' + id; },
+    'mock-pay': async () => { el.disabled = true; try { const r = await store.mockPay(id, v); const o = S.orders.find((x) => x.id === id); if (o) o.payment_status = r.payment_status; keep.set('orders', S.orders); } catch (ex) { toast(ex.message); } go('/order/' + id); },
     'bk-venue': () => { saveBookingForm(); S.booking.venue = id; render(false); },
     'bk-venue-go': () => { S.booking.venue = id; },
     'bk-day': () => { saveBookingForm(); S.booking.day = v; render(false); },
@@ -1061,8 +1075,8 @@ document.addEventListener('click', async (e) => {
     'in-call': () => { S.verify.called = true; const w = document.getElementById('in-wait'); if (w) w.textContent = 'Ждём ваш звонок…'; },
     'in-retry': () => startIncoming(S.verify.phone, null, el),
     'acc-tab': () => { S.accTab = v; render(false); },
-    logout: async () => { await store.guestSignOut(); S.me = null; S.loy = null; S.bookings = null; S.history = null; S.myEvents = null; await loadGuest(); location.hash = '#/'; toast('Вы вышли из кабинета'); },
-    repeat: () => { const o = (S.history || []).find((x) => x.id === id); if (!o) return; for (const l of o.items || []) if (itemById(l.item_id)) setQty(l.item_id, (S.cart[l.item_id] || 0) + l.qty); location.hash = '#/cart'; },
+    logout: async () => { await store.guestSignOut(); S.me = null; S.loy = null; S.bookings = null; S.history = null; S.myEvents = null; await loadGuest(); go('/'); toast('Вы вышли из кабинета'); },
+    repeat: () => { const o = (S.history || []).find((x) => x.id === id); if (!o) return; for (const l of o.items || []) if (itemById(l.item_id)) setQty(l.item_id, (S.cart[l.item_id] || 0) + l.qty); go('/cart'); },
   };
   if (R[a]) await R[a]();
 });
@@ -1082,7 +1096,19 @@ document.addEventListener('submit', async (e) => {
     catch (ex) { toast(ex.message || 'Не сохранилось'); }
   }
 });
-window.addEventListener('hashchange', () => render());
+window.addEventListener('popstate', () => render());
+// Внутренние ссылки открываем без перезагрузки страницы
+document.addEventListener('click', (e) => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest('a[href]'); if (!a || a.target || a.hasAttribute('download')) return;
+  const href = a.getAttribute('href');
+  if (href.startsWith('#')) { if (href.length > 1) { e.preventDefault(); document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth' }); } return; }
+  const u = new URL(a.href, location.href);
+  if (u.origin !== location.origin || /\.(xml|txt|pdf|png|jpe?g|svg)$/.test(u.pathname)) return;
+  e.preventDefault();
+  if (u.pathname + u.search === location.pathname + location.search && !u.hash) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  history.pushState(null, '', u.pathname + u.search + u.hash); render();
+});
 
 /* ---------- запуск ---------- */
 (async function start() {

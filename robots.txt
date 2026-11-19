@@ -1,2 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /login/
+Disallow: /order/
+Disallow: /pay-test/
+Disallow: /*?demo
+Clean-param: pay&demo
+
+Sitemap: https://xn----8sbemauele6bmft5j.xn--p1ai/sitemap.xml

@@ -1,0 +1,34 @@
+# Пересобирает статические страницы сайта (меню, новости, афиша, sitemap) из базы Supabase
+# и коммитит результат в main — GitHub Pages публикует его.
+# Запуск: при изменении исходников, каждые 30 минут (новости из админки появятся на сайте сами) и вручную.
+name: Сборка страниц сайта
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'js/**', 'tools/**', '.github/workflows/build.yml']
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Сборка страниц
+        run: node tools/build.mjs
+      - name: Коммит, если что-то изменилось
+        run: |
+          git config user.name "patriki-site-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Без изменений"; exit 0; fi
+          git commit -q -m "Сборка страниц сайта $(date -u +%F\ %H:%M)"
+          git push
