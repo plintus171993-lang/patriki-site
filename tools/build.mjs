@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFIG } from '../js/config.js';
 import { SEED_CATEGORIES, SEED_ITEMS, SEED_VENUES, HERO_IMG } from '../js/seed.js';
-import { SITE_URL, BRAND, KINDS, PAGES } from '../js/pages.js';
+import { SITE_URL, BRAND, KINDS, PAGES, hoursText, openingHoursLd } from '../js/pages.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OFFLINE = process.argv.includes('--offline');
@@ -62,7 +62,7 @@ function venueLd(v) {
     acceptsReservations: v.booking_enabled !== false && v.accepting !== false,
     hasMenu: url('/menu'),
   };
-  if (v.accepting !== false) ld.openingHours = 'Mo-Su ' + String(v.hours || '12:00–01:00').replace('–', '-');
+  if (v.accepting !== false) ld.openingHours = openingHoursLd(v.hours);
   return ld;
 }
 function crumbs(list) {
@@ -80,7 +80,7 @@ function dishList(items) {
 function venueBlock(v) {
   return `<article class="card venue-card"><div class="between"><h3 class="h3">${esc(BRAND)} — ${esc(v.name)}</h3>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
     <span style="color:var(--text-2)">${esc(v.address)}${v.id === 'murino' ? ', Мурино' : ', Санкт-Петербург'}</span>
-    <span class="muted small">Ежедневно ${esc(v.hours || '12:00–01:00')}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
+    <span class="muted small">${esc(hoursText(v))}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
     <div class="row"><a class="btn btn-ghost btn-sm" href="tel:${esc(String(v.phone || PHONE).replace(/[^+\d]/g, ''))}">${esc(v.phone || PHONE)}</a><a class="btn btn-accent btn-sm" href="/booking/">Забронировать</a></div></article>`;
 }
 const head = (eyebrow, h1, lead) => `<div class="stack" style="gap:8px"><span class="eyebrow accent">${esc(eyebrow)}</span><h1 class="h1">${esc(h1)}</h1>${lead ? `<p class="lead">${esc(lead)}</p>` : ''}</div>`;
@@ -116,7 +116,7 @@ function buildPages(D) {
   const add = (path, main, ld = [], extra = {}) => pages.push({ path, main, ld, ...PAGES[path], ...extra });
 
   add('/', `<section class="hero"><div class="hero-bg" style="background-image:url('${esc(HERO_IMG)}')"></div><div class="wrap">
-      <div class="hero-tags"><span class="tag gold">Ирландский паб</span><span class="tag">Петроградка</span><span class="tag">Мурино</span><span class="tag">12:00–01:00</span></div>
+      <div class="hero-tags"><span class="tag gold">Ирландский паб</span><span class="tag">Петроградка</span><span class="tag">Мурино</span><span class="tag">Каждый день с 12:00</span></div>
       <h1 class="h1">Мясо из <em>смокера</em>, пиво и праздники, которые помнят</h1>
       <p class="lead">Ирландский паб «Патрики» в Санкт-Петербурге: брискет, копчёные крылья, бургеры и пельмени ручной лепки. Забронируйте стол, закажите доставку или соберите своих на день рождения и корпоратив.</p>
       <div class="row" style="margin-top:6px"><a class="btn btn-accent" href="/booking/">Забронировать стол</a><a class="btn btn-outline" href="/delivery/">Заказать доставку</a><a class="btn btn-ghost" href="/events/">Праздник у нас</a></div></div></section>
@@ -180,7 +180,7 @@ function buildPages(D) {
   }
 
   const L = CONFIG.LEGAL;
-  add('/contacts', `<div class="wrap page">${head('Контакты', 'Как нас найти', 'Два паба, одна кухня. Работаем ежедневно с 12:00 до 01:00.')}
+  add('/contacts', `<div class="wrap page">${head('Контакты', 'Как нас найти', 'Два паба, одна кухня. Работаем каждый день с 12:00, в пятницу и субботу — до 4 утра.')}
     <div class="grid g2">${venues.map(venueBlock).join('')}</div>
     <div class="grid g3"><div class="card stack"><span class="eyebrow">Бронь и банкеты</span><a href="tel:+79633027595">${PHONE}</a></div>
       <div class="card stack"><span class="eyebrow">Почта</span><a href="mailto:${esc(L.EMAIL)}">${esc(L.EMAIL)}</a></div>

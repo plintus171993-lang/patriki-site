@@ -5,7 +5,7 @@ import { store } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
-import { KINDS, pageTitle, METRIKA_ID } from './pages.js';
+import { KINDS, pageTitle, METRIKA_ID, hoursText } from './pages.js';
 // Яндекс Метрика: просмотры страниц при переходах без перезагрузки и цели (бронь, заказ, заявка)
 const metrika = (...a) => { try { window.ym?.(METRIKA_ID, ...a); } catch { /* блокировщик рекламы */ } };
 const goal = (name, params) => metrika('reachGoal', name, params);
@@ -278,7 +278,7 @@ function Home() {
   <section class="hero">
     <div class="hero-bg" style="background-image:url('${esc(HERO_IMG)}')"></div>
     <div class="wrap">
-      <div class="hero-tags"><span class="tag gold">Ирландский паб</span><span class="tag">Петроградка</span><span class="tag">Мурино</span><span class="tag">12:00–01:00</span></div>
+      <div class="hero-tags"><span class="tag gold">Ирландский паб</span><span class="tag">Петроградка</span><span class="tag">Мурино</span><span class="tag">Каждый день с 12:00</span></div>
       <h1 class="h1">Мясо из <em>смокера</em>, пиво и праздники, которые помнят</h1>
       <p class="lead">Брискет, копчёные крылья, бургеры и пельмени ручной лепки. Забронируйте стол, закажите доставку или соберите своих на день рождения и корпоратив.</p>
       <div class="row" style="margin-top:6px">
@@ -342,7 +342,7 @@ function VenueCard(v, map = true) {
   return `<article class="card venue-card">
     <div class="between"><span class="h3">${esc(v.name)}</span>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
     <span style="color:var(--text-2)">${icon.pin} ${esc(v.address)}</span>
-    <span class="muted small">Ежедневно ${esc(v.hours || '12:00–01:00')}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
+    <span class="muted small">${esc(hoursText(v))}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
     ${map ? `<div class="map"><iframe loading="lazy" title="Карта: ${esc(v.name)}" src="${esc(mapSrc(v))}"></iframe></div>` : ''}
     <div class="row">
       ${v.phone ? `<a class="btn btn-ghost btn-sm" href="${telHref(v.phone)}">${icon.phone} ${esc(v.phone)}</a>` : ''}
@@ -833,7 +833,7 @@ function NewsItem(id) {
 function Contacts() {
   const L = CONFIG.LEGAL;
   return `<div class="wrap page">
-    <div class="stack" style="gap:8px"><span class="eyebrow accent">Контакты</span><h1 class="h1">Как нас найти</h1><p class="lead">Два паба, одна кухня. Работаем ежедневно с 12:00 до 01:00.</p></div>
+    <div class="stack" style="gap:8px"><span class="eyebrow accent">Контакты</span><h1 class="h1">Как нас найти</h1><p class="lead">Два паба, одна кухня. Работаем каждый день с 12:00, в пятницу и субботу — до 4 утра.</p></div>
     <div class="grid g2">${S.venues.map((v) => VenueCard(v, true)).join('')}</div>
     <div class="grid g3">
       <div class="card stack" style="gap:6px"><span class="eyebrow">Бронь и банкеты</span><a href="tel:+79633027595" style="font-family:var(--display);font-size:24px;text-decoration:none">+7 963 302-75-95</a><span class="muted small">Ответим на вопросы о брони, доставке и мероприятиях</span></div>

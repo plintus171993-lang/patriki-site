@@ -48,7 +48,7 @@ export const PAGES = {
   '/news': { title: 'Новости, акции и афиша — Патрики Паб',
     desc: 'Акции, события, трансляции и новости ирландского паба «Патрики» на Петроградской стороне и в Мурино.' },
   '/contacts': { title: 'Контакты и адреса: ул. Куйбышева, 33/8 и Мурино — Патрики Паб',
-    desc: 'Как найти паб «Патрики»: Петроградка — ул. Куйбышева, 33/8; Мурино — Екатерининская ул., 16/5. Ежедневно 12:00–01:00, телефон +7 963 302-75-95, карта и маршрут.' },
+    desc: 'Как найти паб «Патрики»: Петроградка — ул. Куйбышева, 33/8; Мурино — Екатерининская ул., 16/5. каждый день с 12:00, в пятницу и субботу до 04:00, телефон +7 963 302-75-95, карта и маршрут.' },
   // служебные — закрыты от индексации
   '/login': { title: 'Вход по номеру телефона — Патрики Паб', noindex: true },
   '/account': { title: 'Личный кабинет — Патрики Паб', noindex: true },
@@ -56,6 +56,24 @@ export const PAGES = {
   '/checkout': { title: 'Оформление заказа — Патрики Паб', noindex: true },
 };
 for (const k of KINDS) PAGES['/events/' + k.id] = { title: k.seoTitle, desc: k.seoDesc };
+
+/** Часы работы для показа: «12:00–01:00» → «Ежедневно 12:00–01:00», расписание по дням — как есть. */
+export function hoursText(v) {
+  const h = String(v?.hours || '12:00–01:00');
+  return /[а-яё]/i.test(h) ? h.charAt(0).toUpperCase() + h.slice(1) : 'Ежедневно ' + h;
+}
+/** Часы для schema.org: «пн–чт, вс 12:00–02:00; пт–сб 12:00–04:00» → ['Mo-Th,Su 12:00-02:00', 'Fr-Sa 12:00-04:00']. */
+export function openingHoursLd(hours) {
+  const D = { пн: 'Mo', вт: 'Tu', ср: 'We', чт: 'Th', пт: 'Fr', сб: 'Sa', вс: 'Su' };
+  const h = String(hours || '12:00–01:00').replace(/[–—]/g, '-');
+  if (!/[а-яё]/i.test(h)) return 'Mo-Su ' + h.replace(/\s+/g, '');
+  return h.split(';').map((part) => {
+    const m = part.trim().match(/^(.*?)\s*(\d{1,2}:\d{2}-\d{1,2}:\d{2})$/);
+    if (!m) return null;
+    const days = m[1].toLowerCase().replace(/[а-яё]{2}/g, (d) => D[d] || d).replace(/\s+/g, '');
+    return `${days} ${m[2]}`;
+  }).filter(Boolean);
+}
 
 /** Заголовок окна для маршрута (в браузере). */
 export function pageTitle(route) {
