@@ -5,7 +5,7 @@ import { store } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
-import { KINDS, pageTitle, METRIKA_ID, hoursText } from './pages.js';
+import { KINDS, pageTitle, METRIKA_ID, hoursText, VENUE_PAGES } from './pages.js';
 // Яндекс Метрика: просмотры страниц при переходах без перезагрузки и цели (бронь, заказ, заявка)
 const metrika = (...a) => { try { window.ym?.(METRIKA_ID, ...a); } catch { /* блокировщик рекламы */ } };
 const goal = (name, params) => metrika('reachGoal', name, params);
@@ -180,6 +180,7 @@ function render(scroll = true) {
   else if (r === '/news') html = News();
   else if (r.startsWith('/news/')) html = NewsItem(r.slice(6));
   else if (r === '/contacts') html = Contacts();
+  else if (VENUE_PAGES.some((p) => r === '/' + p.slug)) html = VenuePage(VENUE_PAGES.find((p) => r === '/' + p.slug));
   else if (r === '/login') html = Login();
   else if (r === '/account') html = Account();
   else html = `<div class="wrap page"><h1 class="h1">Страница не найдена</h1><a class="btn btn-accent" href="/" style="align-self:flex-start">На главную</a></div>`;
@@ -340,7 +341,7 @@ function mapSrc(v) {
 const routeHref = (v) => (MAPS[v.id] ? `https://yandex.ru/maps/?rtext=~${MAPS[v.id].ll.split(',').reverse().join(',')}&rtt=auto` : `https://yandex.ru/maps/?text=${encodeURIComponent(v.address || '')}`);
 function VenueCard(v, map = true) {
   return `<article class="card venue-card">
-    <div class="between"><span class="h3">${esc(v.name)}</span>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
+    <div class="between"><a class="h3" href="/${esc(v.id)}/" style="text-decoration:none;color:inherit">${esc(v.name)}</a>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
     <span style="color:var(--text-2)">${icon.pin} ${esc(v.address)}</span>
     <span class="muted small">${esc(hoursText(v))}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
     ${map ? `<div class="map"><iframe loading="lazy" title="Карта: ${esc(v.name)}" src="${esc(mapSrc(v))}"></iframe></div>` : ''}
@@ -827,6 +828,21 @@ function NewsItem(id) {
     ${n.ends_on ? `<span class="muted small">Действует до ${fmtDate(n.ends_on, { day: 'numeric', month: 'long', year: 'numeric' })}</span>` : ''}
     <div class="row">${n.kind === 'event' ? '<a class="btn btn-accent" href="/booking/">Забронировать стол</a>' : '<a class="btn btn-accent" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Праздник у нас</a></div>
   </article></div>`;
+}
+
+/* ---------- страница заведения ---------- */
+function VenuePage(p) {
+  const v = S.venues.find((x) => x.id === p.venue) || {};
+  const hits = S.items.filter((x) => x.popular && x.available !== false).slice(0, 4);
+  const soon = v.accepting === false;
+  return `<div class="wrap page">
+    <div class="stack" style="gap:8px"><span class="eyebrow accent">${esc(p.eyebrow)}</span><h1 class="h1">${esc(p.h1)}</h1><p class="lead">${esc(p.lead)}</p></div>
+    <div class="row">${soon ? '<a class="btn btn-accent" href="/events/">Заявка на праздник после открытия</a>' : '<a class="btn btn-accent" href="/booking/">Забронировать стол</a><a class="btn btn-outline" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Банкеты и аренда</a></div>
+    <div class="grid g2" style="align-items:start">${VenueCard(v, true)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p style="margin:0;color:var(--text-2)">${esc(t)}</p>`).join('')}</div></div>
+    ${hits.length ? `<section class="stack" style="gap:18px"><div class="sec-head"><h2 class="h2">Хиты из смокера</h2><a href="/menu/">Всё меню →</a></div><div class="dishes">${hits.map(Dish).join('')}</div></section>` : ''}
+    <section class="stack" style="gap:10px"><h2 class="h3">Праздник ${soon ? 'в Мурино' : 'на Петроградке'}</h2>
+      <div class="row">${KINDS.map((k) => `<a class="tag" href="/events/${k.id}/" style="text-decoration:none">${k.em} ${esc(k.title)}</a>`).join('')}</div></section>
+  </div>`;
 }
 
 /* ---------- контакты ---------- */

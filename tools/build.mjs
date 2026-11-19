@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFIG } from '../js/config.js';
 import { SEED_CATEGORIES, SEED_ITEMS, SEED_VENUES, HERO_IMG } from '../js/seed.js';
-import { SITE_URL, BRAND, KINDS, PAGES, hoursText, openingHoursLd } from '../js/pages.js';
+import { SITE_URL, BRAND, KINDS, PAGES, VENUE_PAGES, hoursText, openingHoursLd } from '../js/pages.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OFFLINE = process.argv.includes('--offline');
@@ -78,7 +78,7 @@ function dishList(items) {
     <div class="dish-foot"><span class="price">${rub(x.price)}</span></div></div></article>`).join('')}</div>`;
 }
 function venueBlock(v) {
-  return `<article class="card venue-card"><div class="between"><h3 class="h3">${esc(BRAND)} — ${esc(v.name)}</h3>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
+  return `<article class="card venue-card"><div class="between"><h3 class="h3"><a href="/${esc(v.id)}/" style="text-decoration:none;color:inherit">${esc(BRAND)} — ${esc(v.name)}</a></h3>${v.accepting === false ? '<span class="pill gold">скоро открытие</span>' : '<span class="pill ok">открыто</span>'}</div>
     <span style="color:var(--text-2)">${esc(v.address)}${v.id === 'murino' ? ', Мурино' : ', Санкт-Петербург'}</span>
     <span class="muted small">${esc(hoursText(v))}${v.zone && v.accepting !== false ? ` · доставка: ${esc(v.zone)}` : ''}</span>
     <div class="row"><a class="btn btn-ghost btn-sm" href="tel:${esc(String(v.phone || PHONE).replace(/[^+\d]/g, ''))}">${esc(v.phone || PHONE)}</a><a class="btn btn-accent btn-sm" href="/booking/">Забронировать</a></div></article>`;
@@ -179,6 +179,17 @@ function buildPages(D) {
     ld, { title: `${n.title} — ${BRAND}`, desc: cut(n.body), lastmod: (n.updated_at || n.created_at || '').slice(0, 10), image: n.image_url });
   }
 
+  for (const p of VENUE_PAGES) {
+    const v = venues.find((x) => x.id === p.venue); if (!v) continue;
+    const soon = v.accepting === false;
+    add('/' + p.slug, `<div class="wrap page">${head(p.eyebrow, p.h1, p.lead)}
+      <div class="row">${soon ? '<a class="btn btn-accent" href="/events/">Заявка на праздник после открытия</a>' : '<a class="btn btn-accent" href="/booking/">Забронировать стол</a><a class="btn btn-outline" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Банкеты и аренда</a></div>
+      <div class="grid g2" style="align-items:start">${venueBlock(v)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p>${esc(t)}</p>`).join('')}</div></div>
+      <section class="stack" style="gap:18px"><h2 class="h2">Хиты из смокера</h2>${dishList((hits.length ? hits : items).slice(0, 4))}<a href="/menu/">Всё меню →</a></section>
+      <section class="stack" style="gap:10px"><h2 class="h3">Праздник ${soon ? 'в Мурино' : 'на Петроградке'}</h2><p>${KINDS.map((k) => `<a href="/events/${k.id}/">${esc(k.title)}</a>`).join(' · ')}</p></section></div>`,
+    [venueLd(v), crumbs([['/' + p.slug, p.eyebrow]])]);
+  }
+
   const L = CONFIG.LEGAL;
   add('/contacts', `<div class="wrap page">${head('Контакты', 'Как нас найти', 'Два паба, одна кухня. Работаем каждый день с 12:00, в пятницу и субботу — до 4 утра.')}
     <div class="grid g2">${venues.map(venueBlock).join('')}</div>
@@ -223,7 +234,7 @@ function write(rel, content) {
 
 const D = await loadData();
 const pages = buildPages(D);
-for (const dir of ['menu', 'delivery', 'booking', 'events', 'news', 'contacts', 'login', 'account', 'cart', 'checkout']) rmSync(join(ROOT, dir), { recursive: true, force: true });
+for (const dir of ['petrogradka', 'murino', 'menu', 'delivery', 'booking', 'events', 'news', 'contacts', 'login', 'account', 'cart', 'checkout']) rmSync(join(ROOT, dir), { recursive: true, force: true });
 for (const pg of pages) write(pg.path === '/' ? 'index.html' : pg.path.slice(1) + '/index.html', renderPage(pg));
 // 404.html: GitHub Pages отдаёт его на любой неизвестный адрес — /order/<id>/, /pay-test/<id>/ и опечатки
 write('404.html', renderPage({ path: '/404', title: 'Патрики Паб', desc: PAGES['/'].desc, noindex: true, main: '' }));
