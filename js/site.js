@@ -111,6 +111,15 @@ async function grantPd(source) {
   try { await store.recordConsent('pd', true, CV, source); S.profile = { ...S.profile, pd_consent_version: CV }; } catch (e) { console.warn(e); }
 }
 const consentOk = (form) => hasPdConsent() || !!form?.pdConsent?.checked;
+// Согласие на рекламу (38-ФЗ, ст. 18) — отдельная необязательная галочка, по умолчанию выключена
+const MarketingBox = () => S.profile.marketing_consent ? '' : `<label class="check"><input type="checkbox" name="mktConsent">
+  <span>Присылать акции, афишу матчей и приглашения — даю ${doc('ads', 'согласие на получение рекламы')} (необязательно)</span></label>`;
+const rememberMkt = (form) => keep.set('mktConsent', !!form?.mktConsent?.checked);
+async function setMarketing(on, source) {
+  await store.recordConsent('marketing', on, CONFIG.LEGAL.EDITION, source);
+  S.profile = { ...S.profile, marketing_consent: on };
+  if (on) goal('marketing_consent');
+}
 
 /* ---------- данные ---------- */
 async function loadGuest() {
@@ -905,6 +914,7 @@ function Login() {
     <form id="phone-form" class="stack" style="gap:14px">
       <label class="field">Номер мобильного<input class="input" name="phone" type="tel" autocomplete="tel" data-phone placeholder="${PHONE_PH}" value="${esc(fmtPhone(v.phone || S.profile.phone || ''))}"></label>
       ${ConsentBox()}
+      ${MarketingBox()}
       <p class="error" role="alert"></p>
       <button type="button" class="btn btn-accent btn-block" data-act="tg-start">${icon.tg} Войти через Telegram</button>
       <div class="or-line"><span>или</span></div>
@@ -918,6 +928,7 @@ async function startTg(btn) {
   const form = document.getElementById('phone-form');
   if (form && !consentOk(form)) { form.querySelector('.error').textContent = 'Отметьте согласие на обработку персональных данных'; return; }
   if (form?.pdConsent?.checked) keep.set('pdConsent', CV);
+  if (form) rememberMkt(form);
   btn.disabled = true;
   try {
     const r = await store.tgStart();
@@ -968,6 +979,8 @@ async function finishVerify(r) {
   catch (e) { S.verify.err = e.message; return render(false); }
   await loadGuest();
   if (keep.get('pdConsent', '') === CV && S.profile.pd_consent_version !== CV) await grantPd('site-verify');
+  if (keep.get('mktConsent', false) && !S.profile.marketing_consent) { try { await setMarketing(true, 'site-verify'); } catch (e) { console.warn(e); } }
+  keep.set('mktConsent', false);
   const p10 = phone10(r.phone || S.me?.phone || '');
   if (p10 && phone10(S.profile.phone || '') !== p10) { try { S.profile = await store.saveProfile({ ...S.profile, phone: fmtPhone(p10) }); } catch (e) { console.warn(e); } }
   goal('login');
@@ -1062,6 +1075,8 @@ function AccMe() {
   return `<form id="me-form" class="card stack" style="max-width:560px;gap:16px">
     <label class="field">Имя<input class="input" name="name" value="${esc(p.name || '')}" autocomplete="name"></label>
     <label class="field">День рождения<input class="input" type="date" name="birthday" value="${esc(p.birthday || '')}"></label>
+    <label class="check"><input type="checkbox" data-act="marketing" ${p.marketing_consent ? 'checked' : ''}>
+      <span>Акции, афиша матчей и приглашения — присылать в Telegram и SMS. ${doc('ads', 'Условия')}; отключить можно здесь в любой момент.</span></label>
     <span class="muted small">Телефон ${esc(fmtPhone(S.me.phone))} подтверждён. Адреса доставки и согласия — те же, что в приложении.</span>
     <button class="btn btn-accent" type="submit" style="align-self:flex-start">Сохранить</button></form>`;
 }
@@ -1082,6 +1097,11 @@ document.addEventListener('click', async (e) => {
     inc: () => { if (el.closest('.modal-wrap')) return; setQty(id, (S.cart[id] || 0) + 1); render(false); },
     dec: () => { if (el.closest('.modal-wrap')) return; setQty(id, (S.cart[id] || 0) - 1); render(false); },
     item: () => openItem(id),
+    marketing: async () => {
+      const on = el.checked;
+      try { await setMarketing(on, 'site-account'); toast(on ? 'Будем присылать акции и афишу' : 'Рассылка отключена'); }
+      catch (ex) { el.checked = !on; toast(ex.message || 'Не сохранилось'); }
+    },
     venue: () => { saveCheckoutForm(); S.venueId = id; keep.set('venue', id); render(false); },
     cat: () => { e.preventDefault(); document.getElementById('cat-' + id)?.scrollIntoView({ behavior: 'smooth' }); },
     'pick-addr': () => { saveCheckoutForm(); S.checkout.addr = id; render(false); },
@@ -1123,6 +1143,7 @@ document.addEventListener('submit', async (e) => {
     const err = f.querySelector('.error');
     if (!consentOk(f)) { err.textContent = 'Отметьте согласие на обработку персональных данных'; return; }
     if (f.pdConsent?.checked) keep.set('pdConsent', CV);
+    rememberMkt(f);
     return startIncoming(phone10(f.phone.value), err, f.querySelector('[type=submit]'));
   }
   if (f.id === 'me-form') {
