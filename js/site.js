@@ -141,6 +141,7 @@ const qs = () => new URLSearchParams(location.search);
 const withSlash = (p) => { const [path, rest = ''] = String(p).split(/(?=[?#])/); return (path === '/' || path.endsWith('/') ? path : path + '/') + rest; };
 function go(p, replace = false) { history[replace ? 'replaceState' : 'pushState'](null, '', withSlash(p)); render(); }
 // Старые адреса вида /#/events?k=birthday (ссылки, закладки, возврат из оплаты Сбера) → /events/birthday/
+const pathAtLoad = location.pathname;
 (function legacyHash() {
   const h = location.hash;
   if (!h.startsWith('#/')) return;
@@ -153,7 +154,8 @@ function go(p, replace = false) { history[replace ? 'replaceState' : 'pushState'
   const rest = p.toString();
   history.replaceState(null, '', withSlash(to) + (rest ? '?' + rest : '') + anchor);
 })();
-const initialRoute = route(), initialTitle = document.title;
+// заголовок из готовой страницы годится, только если адрес не меняли старым #/-перенаправлением
+const initialRoute = location.pathname === pathAtLoad ? route() : null, initialTitle = document.title;
 const rerenderIf = (list) => { const r = route(); if (list.some((x) => (x.endsWith('/') && x !== '/' ? r.startsWith(x) : r === x))) render(false); };
 let lastRoute = null;
 
