@@ -872,7 +872,7 @@ function Contacts() {
     <div class="grid g3">
       <div class="card stack" style="gap:6px"><span class="eyebrow">Бронь и банкеты</span><a href="tel:+79633027595" style="font-family:var(--display);font-size:24px;text-decoration:none">+7 963 302-75-95</a><span class="muted small">Ответим на вопросы о брони, доставке и мероприятиях</span></div>
       <div class="card stack" style="gap:6px"><span class="eyebrow">Почта</span><a href="mailto:${esc(L.EMAIL)}" style="font-size:18px">${esc(L.EMAIL)}</a><span class="muted small">Предложения, претензии и запросы по персональным данным</span></div>
-      <div class="card stack" style="gap:6px"><span class="eyebrow">Telegram</span><a href="https://t.me/PatrikiPubBot" target="_blank" rel="noopener" style="font-size:18px">${icon.tg} @PatrikiPubBot</a><span class="muted small">Бот для входа по номеру телефона</span></div>
+      <div class="card stack" style="gap:6px"><span class="eyebrow">Telegram</span><a href="https://t.me/patriki_pub" target="_blank" rel="noopener" style="font-size:18px">${icon.tg} @patriki_pub</a><span class="muted small">Группа паба: ланчи, акции и трансляции. Вход на сайт — через бота <a href="https://t.me/PatrikiPubBot" target="_blank" rel="noopener">@PatrikiPubBot</a></span></div>
     </div>
     <section class="card stack" style="gap:6px"><span class="eyebrow">Продавец</span>
       ${[['Продавец', L.SELLER], ['ИНН', L.INN], ['ОГРН', L.OGRN], ['Юридический адрес', L.ADDRESS]].filter(([, v]) => v).map(([k, v]) => `<div class="sum-row"><span class="muted">${k}</span><span style="text-align:right">${esc(v)}</span></div>`).join('')}

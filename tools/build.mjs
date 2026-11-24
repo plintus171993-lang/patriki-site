@@ -61,6 +61,7 @@ function venueLd(v) {
       ...(v.id === 'murino' ? { addressRegion: 'Ленинградская область' } : {}), addressCountry: 'RU' },
     acceptsReservations: v.booking_enabled !== false && v.accepting !== false,
     hasMenu: url('/menu'),
+    sameAs: ['https://t.me/patriki_pub'],
   };
   if (v.accepting !== false) ld.openingHours = openingHoursLd(v.hours);
   return ld;
@@ -195,7 +196,7 @@ function buildPages(D) {
     <div class="grid g2">${venues.map(venueBlock).join('')}</div>
     <div class="grid g3"><div class="card stack"><span class="eyebrow">Бронь и банкеты</span><a href="tel:+79633027595">${PHONE}</a></div>
       <div class="card stack"><span class="eyebrow">Почта</span><a href="mailto:${esc(L.EMAIL)}">${esc(L.EMAIL)}</a></div>
-      <div class="card stack"><span class="eyebrow">Telegram</span><a href="https://t.me/PatrikiPubBot" rel="noopener">@PatrikiPubBot</a></div></div>
+      <div class="card stack"><span class="eyebrow">Telegram</span><a href="https://t.me/patriki_pub" rel="noopener">@patriki_pub</a><span>Группа паба: ланчи, акции и трансляции. Вход на сайт — через бота <a href="https://t.me/PatrikiPubBot" rel="noopener">@PatrikiPubBot</a></span></div></div>
     <section class="card stack"><span class="eyebrow">Продавец</span><span>${esc(L.SELLER)}, ИНН ${esc(L.INN)}</span><span>${esc(L.ADDRESS)}</span></section></div>`,
   [...venueLds, crumbs([['/contacts', 'Контакты']])]);
 
