@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<yml_catalog date="2026-11-24 20:24">
+  <shop>
+    <name>Патрики Паб</name>
+    <company>ООО «ПАТРИККИ ПАБ»</company>
+    <currencies><currency id="RUB" rate="1"/></currencies>
+    <categories>
+      <category id="1">Блюда в смокере</category>
+      <category id="2">Бургеры и шаверма</category>
+      <category id="3">Салаты</category>
+      <category id="4">Холодные закуски</category>
+      <category id="5">Горячие закуски</category>
+      <category id="6">Супы</category>
+      <category id="7">Стейк дня</category>
+      <category id="8">Колбаски</category>
+      <category id="9">Горячие блюда</category>
+      <category id="10">Пельмени ручной лепки</category>
+      <category id="11">Сеты и миксы</category>
+      <category id="12">Бизнес-ланч</category>
+      <category id="13">Банкеты и мероприятия</category>
+      <category id="14">Пиво</category>
+      <category id="15">Соусы</category>
+      <category id="16">Гарниры</category>
+    </categories>
+    <offers>
+      <offer id="m-seed-1">
+        <name>Копчёные куриные крылья</name>
+        <vendor>Патрики Паб</vendor>
+        <price>740</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-1.jpg</picture>
+      </offer>
+      <offer id="m-seed-2">
+        <name>Скумбрия нашего копчения</name>
+        <vendor>Патрики Паб</vendor>
+        <price>740</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-2.jpg</picture>
+      </offer>
+      <offer id="m-seed-3">
+        <name>Техасский брискет</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1490</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-3.jpg</picture>
+        <description>Выход: 370 г</description>
+      </offer>
+      <offer id="m-seed-4">
+        <name>Полкило шавермы с брискетом</name>
+        <vendor>Патрики Паб</vendor>
+        <price>850</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-4.jpg</picture>
+        <description>Выход: 500 г</description>
+      </offer>
+      <offer id="m-seed-5">
+        <name>Классический бургер с говяжьей котлетой</name>
+        <vendor>Патрики Паб</vendor>
+        <price>840</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>2</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-5.jpg</picture>
+        <description>Выход: 500 г</description>
+      </offer>
+      <offer id="m-seed-6">
+        <name>Бургер «Сырный Патрик» с говяжьей и сырной котлетой</name>
+        <vendor>Патрики Паб</vendor>
+        <price>850</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>2</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-6.jpg</picture>
+        <description>Выход: 500 г</description>
+      </offer>
+      <offer id="m-seed-7">
+        <name>Бургер «Патрики» с брискетом</name>
+        <vendor>Патрики Паб</vendor>
+        <price>980</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>2</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-7.jpg</picture>
+        <description>Выход: 500 г</description>
+      </offer>
+      <offer id="m-seed-8">
+        <name>Цезарь</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>3</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-8.jpg</picture>
+        <description>Выход: 260 г</description>
+      </offer>
+      <offer id="m-seed-9">
+        <name>Тёплый салат с баклажаном и сыром</name>
+        <vendor>Патрики Паб</vendor>
+        <price>630</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>3</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-9.jpg</picture>
+        <description>Выход: 290 г</description>
+      </offer>
+      <offer id="m-seed-10">
+        <name>Тёплый салат с фланк-стейком</name>
+        <vendor>Патрики Паб</vendor>
+        <price>670</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>3</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-10.jpg</picture>
+        <description>Выход: 290 г</description>
+      </offer>
+      <offer id="m-seed-11">
+        <name>Сало домашнее</name>
+        <vendor>Патрики Паб</vendor>
+        <price>470</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>4</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-11.jpg</picture>
+      </offer>
+      <offer id="m-seed-17">
+        <name>Уши свиные</name>
+        <vendor>Патрики Паб</vendor>
+        <price>470</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>4</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-17.jpg</picture>
+      </offer>
+      <offer id="m-seed-18">
+        <name>Луковые кольца</name>
+        <vendor>Патрики Паб</vendor>
+        <price>490</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-18.jpg</picture>
+      </offer>
+      <offer id="m-seed-19">
+        <name>Кольца кальмара</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-19.jpg</picture>
+      </offer>
+      <offer id="m-seed-20">
+        <name>Гренки чесночные с пармезаном</name>
+        <vendor>Патрики Паб</vendor>
+        <price>360</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-20.jpg</picture>
+      </offer>
+      <offer id="m-seed-21">
+        <name>Сырные палочки моцарелла</name>
+        <vendor>Патрики Паб</vendor>
+        <price>470</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-21.jpg</picture>
+      </offer>
+      <offer id="m-seed-22">
+        <name>Креветки васаби</name>
+        <vendor>Патрики Паб</vendor>
+        <price>650</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-22.jpg</picture>
+      </offer>
+      <offer id="m-seed-23">
+        <name>Картофель фри с пармезаном</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-23.jpg</picture>
+      </offer>
+      <offer id="m-seed-24">
+        <name>Фиш энд чипс</name>
+        <vendor>Патрики Паб</vendor>
+        <price>560</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-24.jpg</picture>
+      </offer>
+      <offer id="m-seed-25">
+        <name>Варёные пивные креветки</name>
+        <vendor>Патрики Паб</vendor>
+        <price>520</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-25.jpg</picture>
+      </offer>
+      <offer id="m-seed-27">
+        <name>Хлебная корзина</name>
+        <vendor>Патрики Паб</vendor>
+        <price>270</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-27.jpg</picture>
+      </offer>
+      <offer id="m-seed-28">
+        <name>Борщ с техасским брискетом</name>
+        <vendor>Патрики Паб</vendor>
+        <price>540</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>6</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-28.jpg</picture>
+        <description>Выход: 450 г</description>
+      </offer>
+      <offer id="m-seed-29">
+        <name>Солянка сборная мясная</name>
+        <vendor>Патрики Паб</vendor>
+        <price>580</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>6</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-29.jpg</picture>
+        <description>Выход: 420 г</description>
+      </offer>
+      <offer id="m-seed-30">
+        <name>Стейк дня</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1320</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>7</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-30.jpg</picture>
+        <description>Какой сегодня — уточним при звонке</description>
+      </offer>
+      <offer id="m-seed-31">
+        <name>Колбаски свиные с сыром</name>
+        <vendor>Патрики Паб</vendor>
+        <price>690</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>8</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-31.jpg</picture>
+      </offer>
+      <offer id="m-seed-32">
+        <name>Колбаски куриные</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>8</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-32.jpg</picture>
+      </offer>
+      <offer id="m-seed-33">
+        <name>Колбаски говяжьи</name>
+        <vendor>Патрики Паб</vendor>
+        <price>690</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>8</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-33.jpg</picture>
+      </offer>
+      <offer id="m-seed-34">
+        <name>Рёбра свиные с коул слоу</name>
+        <vendor>Патрики Паб</vendor>
+        <price>760</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-34.jpg</picture>
+        <description>Выход: 310 г</description>
+      </offer>
+      <offer id="m-seed-35">
+        <name>Ирландские драники с котлетой</name>
+        <vendor>Патрики Паб</vendor>
+        <price>640</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-35.jpg</picture>
+        <description>Выход: 420 г</description>
+      </offer>
+      <offer id="m-seed-36">
+        <name>Шницель австрийский</name>
+        <vendor>Патрики Паб</vendor>
+        <price>670</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-36.jpg</picture>
+      </offer>
+      <offer id="m-seed-37">
+        <name>Щёки телячьи с картофельным пюре и жареным луком</name>
+        <vendor>Патрики Паб</vendor>
+        <price>790</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-37.jpg</picture>
+      </offer>
+      <offer id="m-seed-38">
+        <name>Пельмени ручной лепки со свининой</name>
+        <vendor>Патрики Паб</vendor>
+        <price>570</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>10</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-38.jpg</picture>
+      </offer>
+      <offer id="m-seed-39">
+        <name>Пельмени ручной лепки с говядиной и копчёным сыром</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>10</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-39.jpg</picture>
+      </offer>
+      <offer id="m-seed-40">
+        <name>Пельмени ручной лепки: баранина, свинина, говядина</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>10</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-40.jpg</picture>
+      </offer>
+      <offer id="m-seed-42">
+        <name>Пивной сырный микс</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>11</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-42.jpg</picture>
+      </offer>
+      <offer id="m-seed-43">
+        <name>Сыровяленый микс</name>
+        <vendor>Патрики Паб</vendor>
+        <price>790</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>11</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-43.jpg</picture>
+      </offer>
+      <offer id="m-seed-44">
+        <name>Микс закусок к пиву</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1690</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>11</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-44.jpg</picture>
+      </offer>
+      <offer id="m-seed-45">
+        <name>Микс колбас с коул слоу и соусом</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1740</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>11</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/seed-45.jpg</picture>
+      </offer>
+      <offer id="m-aea683ee-fe7b-4f1d-ad30-23aeea066a17">
+        <name>Монгольский суп с бараниной</name>
+        <vendor>Патрики Паб</vendor>
+        <price>670</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>6</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/aea683ee-fe7b-4f1d-ad30-23aeea066a17.jpg</picture>
+      </offer>
+      <offer id="m-50056c1b-892e-4643-9af8-00bfeb3d334f">
+        <name>Картофель жареный с грибами и свиной колбаской</name>
+        <vendor>Патрики Паб</vendor>
+        <price>740</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/50056c1b-892e-4643-9af8-00bfeb3d334f.jpg</picture>
+      </offer>
+      <offer id="m-8a92cb54-a511-4861-a23b-90f26b16e924">
+        <name>Томленая баранина со шницелем из баклажана</name>
+        <vendor>Патрики Паб</vendor>
+        <price>980</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://raw.githubusercontent.com/plintus171993-lang/patriki-site/main/img/menu/8a92cb54-a511-4861-a23b-90f26b16e924.jpg</picture>
+      </offer>
+      <offer id="lunch">
+        <name>Бизнес-ланч</name>
+        <vendor>Патрики Паб</vendor>
+        <price>590</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>12</categoryId>
+        <description>Комплексный обед с 12:00 до 16:00, меню меняется каждый день. К ланчу — пиво или морс.</description>
+      </offer>
+      <offer id="svc-banquet">
+        <name>Банкет</name>
+        <vendor>Патрики Паб</vendor>
+        <price>9900</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>13</categoryId>
+        <description>Банкеты на компанию: меню из смокера, закуски к пиву, своё пиво «Патрики». Стоимость от 9 900 ₽. Заявка на сайте в разделе «Мероприятия».</description>
+      </offer>
+      <offer id="svc-corporate">
+        <name>Корпоратив</name>
+        <vendor>Патрики Паб</vendor>
+        <price>9900</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>13</categoryId>
+        <description>Корпоративы и новогодние праздники: подберём меню под вашу компанию. Трансляции, настольный футбол. Стоимость от 9 900 ₽.</description>
+      </offer>
+      <offer id="svc-birthday">
+        <name>День рождения в пабе</name>
+        <vendor>Патрики Паб</vendor>
+        <price>9900</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>13</categoryId>
+        <description>Отметьте день рождения в ирландском пабе: мясо из смокера, пиво на кранах, музыка. Стоимость от 9 900 ₽.</description>
+      </offer>
+      <offer id="svc-rent">
+        <name>Аренда зала</name>
+        <vendor>Патрики Паб</vendor>
+        <price>9900</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>13</categoryId>
+        <description>Аренда зала паба под ваше мероприятие. Стоимость от 9 900 ₽, зависит от дня и количества гостей.</description>
+      </offer>
+      <offer id="beer-helles">
+        <name>«Патрики» Helles</name>
+        <vendor>Патрики Паб</vendor>
+        <price>380</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-stout">
+        <name>«Патрики» Stout</name>
+        <vendor>Патрики Паб</vendor>
+        <price>410</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-nitro">
+        <name>«Патрики» Nitro Lager</name>
+        <vendor>Патрики Паб</vendor>
+        <price>420</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-amber">
+        <name>Amber Ale</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-dipa">
+        <name>Double IPA</name>
+        <vendor>Патрики Паб</vendor>
+        <price>410</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-blond">
+        <name>Belgian Blond</name>
+        <vendor>Патрики Паб</vendor>
+        <price>430</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-brewdog">
+        <name>BrewDog Shore Leave</name>
+        <vendor>Патрики Паб</vendor>
+        <price>520</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-erdinger">
+        <name>Erdinger</name>
+        <vendor>Патрики Паб</vendor>
+        <price>520</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-blanche">
+        <name>Maison Arné Bière Blanche</name>
+        <vendor>Патрики Паб</vendor>
+        <price>420</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-ruby">
+        <name>Ruby Cherry</name>
+        <vendor>Патрики Паб</vendor>
+        <price>520</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-amnesia">
+        <name>Milkshake Amnesia</name>
+        <vendor>Патрики Паб</vendor>
+        <price>430</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-kriek">
+        <name>Вишнёвый Kriek</name>
+        <vendor>Патрики Паб</vendor>
+        <price>410</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="beer-kamburak">
+        <name>Kamburak</name>
+        <vendor>Патрики Паб</vendor>
+        <price>460</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="cider-domkrat">
+        <name>Сидр «Святой домкрат»</name>
+        <vendor>Патрики Паб</vendor>
+        <price>420</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>14</categoryId>
+      </offer>
+      <offer id="sauce-aioli">
+        <name>Соус айоли</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="sauce-ketchup">
+        <name>Кетчуп</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="sauce-oyster">
+        <name>Сливочно-устричный соус</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="sauce-chili">
+        <name>Соус сладкий чили</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="sauce-bbq">
+        <name>Соус BBQ</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="sauce-cheese">
+        <name>Сырный соус</name>
+        <vendor>Патрики Паб</vendor>
+        <price>80</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>15</categoryId>
+      </offer>
+      <offer id="side-coleslaw">
+        <name>Коул слоу с ореховым соусом</name>
+        <vendor>Патрики Паб</vendor>
+        <price>250</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>16</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/2760763/2a00000195c9b04c937e933f524f05dbaa0a/orig</picture>
+      </offer>
+      <offer id="side-idaho">
+        <name>Картофель айдахо</name>
+        <vendor>Патрики Паб</vendor>
+        <price>250</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>16</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/4322053/2a00000195c9bba0b988e8a7c63bf9ca594f/orig</picture>
+      </offer>
+      <offer id="side-fries">
+        <name>Картофель фри</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>16</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/5393394/2a00000195c9ce549b36821816ef50282e49/orig</picture>
+      </offer>
+      <offer id="side-baked">
+        <name>Картофель запечённый</name>
+        <vendor>Патрики Паб</vendor>
+        <price>250</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>16</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/8331772/2a00000195c9af48eb8ff6bca8300b31eac6/orig</picture>
+      </offer>
+      <offer id="mix-bbq">
+        <name>Микс BBQ</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1860</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>11</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/5393394/2a00000195c9b948f2cbc53d82ace098a61b/orig</picture>
+        <description>Рёбра гриль, 2 вида колбасок, 3 соуса, коул слоу и запечённый картофель.</description>
+      </offer>
+      <offer id="wings-glaze">
+        <name>Куриные крылья в глазури</name>
+        <vendor>Патрики Паб</vendor>
+        <price>580</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/1644120/2a00000195c9d07d5e8e67f37cd0169816a6/orig</picture>
+      </offer>
+      <offer id="dumplings-fried">
+        <name>Пельмени жареные</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/1643978/2a00000195c9a39bf554193b3a71a964deb5/orig</picture>
+      </offer>
+      <offer id="chips-pork">
+        <name>Свиные чипсы</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>4</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/2773996/2a00000195cce6af2002777a3363f5a964fb/orig</picture>
+      </offer>
+      <offer id="chips-beef">
+        <name>Чипсы говяжьи</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>4</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/4079840/2a00000195cce6dde953287d47484fbe11af/orig</picture>
+      </offer>
+      <offer id="chips-chicken">
+        <name>Чипсы куриные</name>
+        <vendor>Патрики Паб</vendor>
+        <price>390</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>4</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/2791887/2a00000195cce718d5dc9fa12ce315dee784/orig</picture>
+      </offer>
+      <offer id="ribs-beef">
+        <name>Рёбра говяжьи с коул слоу</name>
+        <vendor>Патрики Паб</vendor>
+        <price>1790</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>9</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/1424222/2a00000195c9bb3244d8a0b8ee4db6a76495/orig</picture>
+      </offer>
+      <offer id="smelt" available="unknown">
+        <name>Корюшка</name>
+        <vendor>Патрики Паб</vendor>
+        <price>680</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>5</categoryId>
+        <picture>https://avatars.mds.yandex.net/get-sprav-products/4078836/2a0000019d90fd4fac0a12c53a782d8b8d1f/orig</picture>
+      </offer>
+    </offers>
+  </shop>
+</yml_catalog>
