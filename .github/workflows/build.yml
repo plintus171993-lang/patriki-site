@@ -24,6 +24,11 @@ jobs:
           node-version: 22
       - name: Сборка страниц
         run: node tools/build.mjs
+      - name: Прайс для Яндекс Бизнеса (yandex.yml + фото блюд)
+        run: |
+          npm i --no-save --no-package-lock sharp@0.34
+          node tools/yandex-feed.mjs
+          rm -rf node_modules
       - name: Коммит, если что-то изменилось
         run: |
           git config user.name "patriki-site-bot"

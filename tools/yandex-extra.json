@@ -1,0 +1,257 @@
+{
+  "_comment": "Позиции для прайса в Яндекс Бизнесе, которых нет в меню приложения (пиво, соусы, гарниры, услуги). Блюда из приложения попадают в фид сами. rename — названия блюд приложения для Яндекса. Удалите позицию отсюда, и при следующей сборке она пропадёт из Яндекса.",
+  "rename": {
+    "Хуйцаа ( монгольский суп с бараниной)": "Монгольский суп с бараниной",
+    "Сырный Патрик с говяжьей и сырной котлетой": "Бургер «Сырный Патрик» с говяжьей и сырной котлетой",
+    "Бургер с брискетом": "Бургер «Патрики» с брискетом",
+    "Тёплый с баклажаном и сыром": "Тёплый салат с баклажаном и сыром",
+    "Баранина, свинина, говядина": "Пельмени ручной лепки: баранина, свинина, говядина"
+  },
+  "prefix": {
+    "Пельмени ручной лепки": "Пельмени ручной лепки",
+    "Колбаски": "Колбаски"
+  },
+  "items": [
+    {
+      "id": "lunch",
+      "category": "Бизнес-ланч",
+      "name": "Бизнес-ланч",
+      "price": 590,
+      "description": "Комплексный обед с 12:00 до 16:00, меню меняется каждый день. К ланчу — пиво или морс."
+    },
+    {
+      "id": "svc-banquet",
+      "category": "Банкеты и мероприятия",
+      "name": "Банкет",
+      "price": 9900,
+      "description": "Банкеты на компанию: меню из смокера, закуски к пиву, своё пиво «Патрики». Стоимость от 9 900 ₽. Заявка на сайте в разделе «Мероприятия»."
+    },
+    {
+      "id": "svc-corporate",
+      "category": "Банкеты и мероприятия",
+      "name": "Корпоратив",
+      "price": 9900,
+      "description": "Корпоративы и новогодние праздники: подберём меню под вашу компанию. Трансляции, настольный футбол. Стоимость от 9 900 ₽."
+    },
+    {
+      "id": "svc-birthday",
+      "category": "Банкеты и мероприятия",
+      "name": "День рождения в пабе",
+      "price": 9900,
+      "description": "Отметьте день рождения в ирландском пабе: мясо из смокера, пиво на кранах, музыка. Стоимость от 9 900 ₽."
+    },
+    {
+      "id": "svc-rent",
+      "category": "Банкеты и мероприятия",
+      "name": "Аренда зала",
+      "price": 9900,
+      "description": "Аренда зала паба под ваше мероприятие. Стоимость от 9 900 ₽, зависит от дня и количества гостей."
+    },
+    {
+      "id": "beer-helles",
+      "category": "Пиво",
+      "name": "«Патрики» Helles",
+      "price": 380
+    },
+    {
+      "id": "beer-stout",
+      "category": "Пиво",
+      "name": "«Патрики» Stout",
+      "price": 410
+    },
+    {
+      "id": "beer-nitro",
+      "category": "Пиво",
+      "name": "«Патрики» Nitro Lager",
+      "price": 420
+    },
+    {
+      "id": "beer-amber",
+      "category": "Пиво",
+      "name": "Amber Ale",
+      "price": 390
+    },
+    {
+      "id": "beer-dipa",
+      "category": "Пиво",
+      "name": "Double IPA",
+      "price": 410
+    },
+    {
+      "id": "beer-blond",
+      "category": "Пиво",
+      "name": "Belgian Blond",
+      "price": 430
+    },
+    {
+      "id": "beer-brewdog",
+      "category": "Пиво",
+      "name": "BrewDog Shore Leave",
+      "price": 520
+    },
+    {
+      "id": "beer-erdinger",
+      "category": "Пиво",
+      "name": "Erdinger",
+      "price": 520
+    },
+    {
+      "id": "beer-blanche",
+      "category": "Пиво",
+      "name": "Maison Arné Bière Blanche",
+      "price": 420
+    },
+    {
+      "id": "beer-ruby",
+      "category": "Пиво",
+      "name": "Ruby Cherry",
+      "price": 520
+    },
+    {
+      "id": "beer-amnesia",
+      "category": "Пиво",
+      "name": "Milkshake Amnesia",
+      "price": 430
+    },
+    {
+      "id": "beer-kriek",
+      "category": "Пиво",
+      "name": "Вишнёвый Kriek",
+      "price": 410
+    },
+    {
+      "id": "beer-kamburak",
+      "category": "Пиво",
+      "name": "Kamburak",
+      "price": 460
+    },
+    {
+      "id": "cider-domkrat",
+      "category": "Пиво",
+      "name": "Сидр «Святой домкрат»",
+      "price": 420
+    },
+    {
+      "id": "sauce-aioli",
+      "category": "Соусы",
+      "name": "Соус айоли",
+      "price": 80
+    },
+    {
+      "id": "sauce-ketchup",
+      "category": "Соусы",
+      "name": "Кетчуп",
+      "price": 80
+    },
+    {
+      "id": "sauce-oyster",
+      "category": "Соусы",
+      "name": "Сливочно-устричный соус",
+      "price": 80
+    },
+    {
+      "id": "sauce-chili",
+      "category": "Соусы",
+      "name": "Соус сладкий чили",
+      "price": 80
+    },
+    {
+      "id": "sauce-bbq",
+      "category": "Соусы",
+      "name": "Соус BBQ",
+      "price": 80
+    },
+    {
+      "id": "sauce-cheese",
+      "category": "Соусы",
+      "name": "Сырный соус",
+      "price": 80
+    },
+    {
+      "id": "side-coleslaw",
+      "category": "Гарниры",
+      "name": "Коул слоу с ореховым соусом",
+      "price": 250,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/2760763/2a00000195c9b04c937e933f524f05dbaa0a/orig"
+    },
+    {
+      "id": "side-idaho",
+      "category": "Гарниры",
+      "name": "Картофель айдахо",
+      "price": 250,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/4322053/2a00000195c9bba0b988e8a7c63bf9ca594f/orig"
+    },
+    {
+      "id": "side-fries",
+      "category": "Гарниры",
+      "name": "Картофель фри",
+      "price": 390,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/5393394/2a00000195c9ce549b36821816ef50282e49/orig"
+    },
+    {
+      "id": "side-baked",
+      "category": "Гарниры",
+      "name": "Картофель запечённый",
+      "price": 250,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/8331772/2a00000195c9af48eb8ff6bca8300b31eac6/orig"
+    },
+    {
+      "id": "mix-bbq",
+      "category": "Сеты и миксы",
+      "name": "Микс BBQ",
+      "price": 1860,
+      "description": "Рёбра гриль, 2 вида колбасок, 3 соуса, коул слоу и запечённый картофель.",
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/5393394/2a00000195c9b948f2cbc53d82ace098a61b/orig"
+    },
+    {
+      "id": "wings-glaze",
+      "category": "Горячие закуски",
+      "name": "Куриные крылья в глазури",
+      "price": 580,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/1644120/2a00000195c9d07d5e8e67f37cd0169816a6/orig"
+    },
+    {
+      "id": "dumplings-fried",
+      "category": "Горячие закуски",
+      "name": "Пельмени жареные",
+      "price": 390,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/1643978/2a00000195c9a39bf554193b3a71a964deb5/orig"
+    },
+    {
+      "id": "chips-pork",
+      "category": "Холодные закуски",
+      "name": "Свиные чипсы",
+      "price": 390,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/2773996/2a00000195cce6af2002777a3363f5a964fb/orig"
+    },
+    {
+      "id": "chips-beef",
+      "category": "Холодные закуски",
+      "name": "Чипсы говяжьи",
+      "price": 390,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/4079840/2a00000195cce6dde953287d47484fbe11af/orig"
+    },
+    {
+      "id": "chips-chicken",
+      "category": "Холодные закуски",
+      "name": "Чипсы куриные",
+      "price": 390,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/2791887/2a00000195cce718d5dc9fa12ce315dee784/orig"
+    },
+    {
+      "id": "ribs-beef",
+      "category": "Горячие блюда",
+      "name": "Рёбра говяжьи с коул слоу",
+      "price": 1790,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/1424222/2a00000195c9bb3244d8a0b8ee4db6a76495/orig"
+    },
+    {
+      "id": "smelt",
+      "category": "Горячие закуски",
+      "name": "Корюшка",
+      "price": 680,
+      "hidden": true,
+      "picture": "https://avatars.mds.yandex.net/get-sprav-products/4078836/2a0000019d90fd4fac0a12c53a782d8b8d1f/orig"
+    }
+  ]
+}
