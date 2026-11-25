@@ -9,7 +9,7 @@ import { KINDS, pageTitle, METRIKA_ID, hoursText, VENUE_PAGES } from './pages.js
 // Яндекс Метрика: просмотры страниц при переходах без перезагрузки и цели (бронь, заказ, заявка)
 const metrika = (...a) => { try { window.ym?.(METRIKA_ID, ...a); } catch { /* блокировщик рекламы */ } };
 const goal = (name, params) => metrika('reachGoal', name, params);
-let metrikaLast = location.href;
+let metrikaLast = null; // первый просмотр отправляем сами (в init стоит defer:true)
 
 /* ---------- утилиты ---------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -165,6 +165,8 @@ const pathAtLoad = location.pathname;
 })();
 // заголовок из готовой страницы годится, только если адрес не меняли старым #/-перенаправлением
 const initialRoute = location.pathname === pathAtLoad ? route() : null, initialTitle = document.title;
+// Просмотр страницы входа с настоящим источником (поиск, карты, реклама) — иначе Метрика видит только переходы внутри сайта
+metrika('hit', location.href, { title: document.title, referer: document.referrer }); metrikaLast = location.href;
 const rerenderIf = (list) => { const r = route(); if (list.some((x) => (x.endsWith('/') && x !== '/' ? r.startsWith(x) : r === x))) render(false); };
 let lastRoute = null;
 
