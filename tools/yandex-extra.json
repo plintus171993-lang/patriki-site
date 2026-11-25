@@ -49,85 +49,85 @@
     },
     {
       "id": "beer-helles",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "«Патрики» Helles",
       "price": 380
     },
     {
       "id": "beer-stout",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "«Патрики» Stout",
       "price": 410
     },
     {
       "id": "beer-nitro",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "«Патрики» Nitro Lager",
       "price": 420
     },
     {
       "id": "beer-amber",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Amber Ale",
       "price": 390
     },
     {
       "id": "beer-dipa",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Double IPA",
       "price": 410
     },
     {
       "id": "beer-blond",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Belgian Blond",
       "price": 430
     },
     {
       "id": "beer-brewdog",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "BrewDog Shore Leave",
       "price": 520
     },
     {
       "id": "beer-erdinger",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Erdinger",
       "price": 520
     },
     {
       "id": "beer-blanche",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Maison Arné Bière Blanche",
       "price": 420
     },
     {
       "id": "beer-ruby",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Ruby Cherry",
       "price": 520
     },
     {
       "id": "beer-amnesia",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Milkshake Amnesia",
       "price": 430
     },
     {
       "id": "beer-kriek",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Вишнёвый Kriek",
       "price": 410
     },
     {
       "id": "beer-kamburak",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Kamburak",
       "price": 460
     },
     {
       "id": "cider-domkrat",
-      "category": "Пиво",
+      "category": "Крафтовое пиво",
       "name": "Сидр «Святой домкрат»",
       "price": 420
     },
