@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFIG } from '../js/config.js';
 import { SEED_CATEGORIES, SEED_ITEMS, SEED_VENUES, HERO_IMG } from '../js/seed.js';
-import { SITE_URL, BRAND, KINDS, PAGES, VENUE_PAGES, hoursText, openingHoursLd } from '../js/pages.js';
+import { SITE_URL, BRAND, KINDS, PAGES, VENUE_PAGES, hoursText, openingHoursLd, PHOTOS, galleryHtml, linksHtml, faqHtml, faqLd } from '../js/pages.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OFFLINE = process.argv.includes('--offline');
@@ -153,8 +153,8 @@ function buildPages(D) {
       <div class="row"><a class="btn btn-accent" href="#ev-form">Оставить заявку</a><a class="btn btn-outline" href="tel:+79633027595">${PHONE}</a></div></div></section>`;
   add('/events', `<div class="wrap page">${evHero(null)}${eventsBody(null)}</div>`, [crumbs([['/events', 'Банкеты и аренда зала']])]);
   for (const k of KINDS) {
-    add('/events/' + k.id, `<div class="wrap page">${evHero(k)}${eventsBody(k)}</div>`, [crumbs([['/events', 'Банкеты и аренда зала'], ['/events/' + k.id, k.title]]),
-      { '@type': 'Service', name: k.h1, description: k.seoDesc, areaServed: 'Санкт-Петербург', provider: venueLds.map((v) => ({ '@id': v['@id'] })) }]);
+    add('/events/' + k.id, `<div class="wrap page">${evHero(k)}${galleryHtml(k.photos, esc)}${eventsBody(k)}${faqHtml(k.faq, esc)}</div>`, [crumbs([['/events', 'Банкеты и аренда зала'], ['/events/' + k.id, k.title]]),
+      { '@type': 'Service', name: k.h1, description: k.seoDesc, areaServed: 'Санкт-Петербург', provider: venueLds.map((v) => ({ '@id': v['@id'] })) }, ...(k.faq ? [faqLd(k.faq)] : [])]);
   }
 
   add('/news', `<div class="wrap page">${head('Новости и акции', 'Что нового в пабе', 'Акции, события, трансляции и новости обоих пабов.')}
@@ -185,10 +185,11 @@ function buildPages(D) {
     const soon = v.accepting === false;
     add('/' + p.slug, `<div class="wrap page">${head(p.eyebrow, p.h1, p.lead)}
       <div class="row">${soon ? '<a class="btn btn-accent" href="/events/">Заявка на праздник после открытия</a>' : '<a class="btn btn-accent" href="/booking/">Забронировать стол</a><a class="btn btn-outline" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Банкеты и аренда</a></div>
-      <div class="grid g2" style="align-items:start">${venueBlock(v)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p>${esc(t)}</p>`).join('')}</div></div>
+      <div class="grid g2" style="align-items:start">${venueBlock(v)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p>${esc(t)}</p>`).join('')}${linksHtml(p.links, esc)}</div></div>
+      ${galleryHtml(p.photos, esc)}
       <section class="stack" style="gap:18px"><h2 class="h2">Хиты из смокера</h2>${dishList((hits.length ? hits : items).slice(0, 4))}<a href="/menu/">Всё меню →</a></section>
       <section class="stack" style="gap:10px"><h2 class="h3">Праздник ${soon ? 'в Мурино' : 'на Петроградке'}</h2><p>${KINDS.map((k) => `<a href="/events/${k.id}/">${esc(k.title)}</a>`).join(' · ')}</p></section></div>`,
-    [venueLd(v), crumbs([['/' + p.slug, p.eyebrow]])]);
+    [venueLd(v), crumbs([['/' + p.slug, p.eyebrow]])], p.photos ? { image: SITE_URL + PHOTOS[p.photos[0]].src } : {});
   }
 
   const L = CONFIG.LEGAL;

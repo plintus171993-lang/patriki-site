@@ -5,7 +5,7 @@ import { store } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
-import { KINDS, pageTitle, METRIKA_ID, hoursText, VENUE_PAGES } from './pages.js';
+import { KINDS, pageTitle, METRIKA_ID, hoursText, VENUE_PAGES, galleryHtml, linksHtml, faqHtml } from './pages.js';
 // Яндекс Метрика: просмотры страниц при переходах без перезагрузки и цели (бронь, заказ, заявка)
 const metrika = (...a) => { try { window.ym?.(METRIKA_ID, ...a); } catch { /* блокировщик рекламы */ } };
 const goal = (name, params) => metrika('reachGoal', name, params);
@@ -732,6 +732,7 @@ function Events(kind) {
         <div class="row"><a class="btn btn-accent" href="#ev-form" data-act="ev-scroll">Оставить заявку</a><a class="btn btn-outline" href="${telHref(S.venues[0]?.phone || '+79633027595')}">${icon.phone} ${esc(S.venues[0]?.phone || '+7 963 302-75-95')}</a></div></div>
     </section>
 
+    ${kind ? galleryHtml(kind.photos, esc) : ''}
     <section class="stack" style="gap:18px"><div class="stack" style="gap:4px"><span class="eyebrow accent">Форматы</span><h2 class="h2">${kind ? 'Другие поводы' : 'Под какой повод'}</h2></div>
       <div class="grid g3">${KINDS.map((k) => `<article class="card format"><span class="em" aria-hidden="true">${k.em}</span><a class="h3" href="/events/${k.id}/" style="text-decoration:none;color:inherit">${esc(k.title)}</a><p>${esc(k.text)}</p>
         <button type="button" class="btn btn-ghost btn-sm" data-act="ev-kind" data-v="${k.id}">Выбрать</button></article>`).join('')}</div></section>
@@ -757,6 +758,7 @@ function Events(kind) {
 
     ${evNews.length ? `<section class="stack" style="gap:18px"><div class="stack" style="gap:4px"><span class="eyebrow accent">Афиша</span><h2 class="h2">Ближайшие события в пабе</h2></div>
       <div class="grid g3">${evNews.slice(0, 6).map(NewsCard).join('')}</div></section>` : ''}
+    ${kind ? faqHtml(kind.faq, esc) : ''}
 
     <section class="two-col" id="ev-form">
       <form id="event-form" class="card stack" style="gap:20px" novalidate>
@@ -858,7 +860,8 @@ function VenuePage(p) {
   return `<div class="wrap page">
     <div class="stack" style="gap:8px"><span class="eyebrow accent">${esc(p.eyebrow)}</span><h1 class="h1">${esc(p.h1)}</h1><p class="lead">${esc(p.lead)}</p></div>
     <div class="row">${soon ? '<a class="btn btn-accent" href="/events/">Заявка на праздник после открытия</a>' : '<a class="btn btn-accent" href="/booking/">Забронировать стол</a><a class="btn btn-outline" href="/delivery/">Заказать доставку</a>'}<a class="btn btn-ghost" href="/events/">Банкеты и аренда</a></div>
-    <div class="grid g2" style="align-items:start">${VenueCard(v, true)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p style="margin:0;color:var(--text-2)">${esc(t)}</p>`).join('')}</div></div>
+    <div class="grid g2" style="align-items:start">${VenueCard(v, true)}<div class="stack" style="gap:12px">${p.text.map((t) => `<p style="margin:0;color:var(--text-2)">${esc(t)}</p>`).join('')}${linksHtml(p.links, esc)}</div></div>
+    ${galleryHtml(p.photos, esc)}
     ${hits.length ? `<section class="stack" style="gap:18px"><div class="sec-head"><h2 class="h2">Хиты из смокера</h2><a href="/menu/">Всё меню →</a></div><div class="dishes">${hits.map(Dish).join('')}</div></section>` : ''}
     <section class="stack" style="gap:10px"><h2 class="h3">Праздник ${soon ? 'в Мурино' : 'на Петроградке'}</h2>
       <div class="row">${KINDS.map((k) => `<a class="tag" href="/events/${k.id}/" style="text-decoration:none">${k.em} ${esc(k.title)}</a>`).join('')}</div></section>
