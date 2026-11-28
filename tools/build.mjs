@@ -231,7 +231,8 @@ function renderPage(pg) {
 function write(rel, content) {
   const f = join(ROOT, rel);
   mkdirSync(dirname(f), { recursive: true });
-  writeFileSync(f, content);
+  // фото из хранилища Supabase — через российский адрес (пересылка на хостинге Reg.ru)
+  writeFileSync(f, String(content).replaceAll(CONFIG.SUPABASE_URL + '/storage/', 'https://api.patrikipab.ru/storage/'));
 }
 
 const D = await loadData();

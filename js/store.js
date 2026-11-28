@@ -9,12 +9,33 @@ let sb = null;
 // Плохой интернет / VPN: запрос, который висит дольше 15 секунд, обрываем — приложение
 // покажет сохранённое меню или понятную ошибку, а не вечную загрузку.
 const NET_TIMEOUT = 15000;
-function fetchWithTimeout(input, init = {}) {
+// Сначала российский адрес (api.patrikipab.ru — пересылка на хостинге Reg.ru): у части гостей зарубежный адрес
+// Supabase не открывается. Если российский недоступен — прямой адрес, и 5 минут сразу туда.
+const RU_API = 'https://api.patrikipab.ru';
+let ruOffUntil = 0;
+function fetchOnce(url, init) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), NET_TIMEOUT);
   if (init.signal) init.signal.addEventListener('abort', () => ctrl.abort(), { once: true });
-  return fetch(input, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+  return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(timer));
 }
+async function fetchWithTimeout(input, init = {}) {
+  const url = typeof input === 'string' ? input : (input && input.url) || String(input);
+  const sbBase = CONFIG.SUPABASE_URL.replace(/\/+$/, '');
+  if (!url.startsWith(sbBase) || Date.now() < ruOffUntil) return fetchOnce(url, init);
+  const safe = ['GET', 'HEAD'].includes(String(init.method || 'GET').toUpperCase());
+  try {
+    const r = await fetchOnce(RU_API + url.slice(sbBase.length), init);
+    if (r.status !== 502) return r;          // 502 — пересылка не достучалась до сервера, запрос не дошёл
+  } catch (e) {
+    // запрос точно не ушёл (нет соединения) — или это чтение, его можно повторить
+    if (init.signal?.aborted || !(e.name === 'TypeError' || (e.name === 'AbortError' && safe))) throw e;
+  }
+  ruOffUntil = Date.now() + 5 * 60 * 1000;
+  return fetchOnce(url, init);
+}
+// Фото из хранилища — тоже через российский адрес
+export const mediaUrl = (u) => (typeof u === 'string' && u.startsWith(CONFIG.SUPABASE_URL + '/storage/') ? RU_API + u.slice(CONFIG.SUPABASE_URL.length) : u);
 
 // Меню и заведения сохраняются на телефоне: при следующем запуске приложение открывается сразу,
 // даже без интернета, а свежие данные подгружаются в фоне.

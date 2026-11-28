@@ -1,7 +1,8 @@
 // Стартовое меню (перенесено с Menusa 29.10.2026, опечатки исправлены).
 // Используется для первого заполнения базы и в демо-режиме без сервера.
 // Фото хранятся в нашем хранилище Supabase (bucket menu), перенесены с CDN Menusa 13.11.2026.
-const MEDIA = 'https://ozbdmczmpejyctezxrdk.supabase.co/storage/v1/object/public/menu/';
+// через российский адрес (пересылка на хостинге Reg.ru) — у части гостей зарубежный адрес не открывается
+const MEDIA = 'https://api.patrikipab.ru/storage/v1/object/public/menu/';
 const IMG = (path) => MEDIA + path;
 
 export const HERO_IMG = MEDIA + 'site/hero.avif';
