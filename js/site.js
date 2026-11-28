@@ -1,7 +1,7 @@
 // Сайт «Патрики Паб» (веселый-патрик.рф). Та же база и те же правила, что у приложения:
 // меню, доставка, бронь, вход по номеру телефона, карта гостя — через js/store.js (копия из patriki-app).
 // Своё у сайта: новости и акции (таблица news) и заявки на мероприятия (submit_event_request).
-import { store } from './store.js';
+import { store, mediaUrl } from './store.js';
 import { CONFIG } from './config.js';
 import { HERO_IMG } from './seed.js';
 import { qrSvg, qrPayload } from './loyalty.js';
@@ -66,7 +66,7 @@ const icon = {
   tg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.7 19.5c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.2-8.3c.4-.4-.1-.6-.6-.2L6.2 13.2l-4.9-1.5c-1-.3-1.1-1 .2-1.5L20.6 3c.9-.3 1.6.2 1.3 1.3z"/></svg>',
 };
 const photo = (url, cls = '', alt = '') => url
-  ? `<div class="photo ph ${cls}"><img src="${esc(url)}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()"></div>`
+  ? `<div class="photo ph ${cls}"><img src="${esc(mediaUrl(url))}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()"></div>`
   : `<div class="photo ph ${cls}" aria-hidden="true"></div>`;
 const loader = (t = 'Загружаем…') => `<div class="pk-loader" role="status"><img src="/img/emblem.svg" alt=""><span>${esc(t)}</span></div>`;
 const LEGAL = 'https://patrikipab.ru/legal/';
